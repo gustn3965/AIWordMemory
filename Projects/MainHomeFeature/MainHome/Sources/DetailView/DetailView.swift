@@ -14,10 +14,16 @@ struct DetailView: View {
     @Environment(\.dismiss) var dismiss
     
     @State var isClicked: Bool = false
+    @State private var speakingIdentity: String? = nil
     var diContainer: MainHomeDependencyInjection
     init(diContainer: MainHomeDependencyInjection, wordIdentity: String, appCoordinator: AppCoordinator) {
         self.diContainer = diContainer
-        _viewModel = StateObject(wrappedValue: DetailViewModel(dbService: diContainer.makeDBImplementation(), wordIdentity: wordIdentity, appleSpeechService: diContainer.makeSpecchAppleVoiceImplementation()))
+        _viewModel = StateObject(wrappedValue: DetailViewModel(
+            dbService: diContainer.makeDBImplementation(),
+            wordIdentity: wordIdentity,
+            appleSpeechService: diContainer.makeSpecchAppleVoiceImplementation(),
+            speechVoiceService: diContainer.makeSpeechVoiceImplementation()
+        ))
         self.appCoordinator = appCoordinator
     }
     
@@ -184,26 +190,28 @@ struct DetailView: View {
                     Image("ph_open-ai-logo-light", bundle: CommonUIResources.bundle)
                         .resizable()
                         .frame(width: 20, height: 20)
-                    Text("AI 문장 학습")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Color.primary)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("AI 문장 학습")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Color.primary)
+                        Text("예문을 터치하면 읽어줍니다")
+                            .font(.caption2)
+                            .foregroundStyle(Color.secondary)
+                    }
                     Spacer()
                 }
 
                 // 문장 목록
                 ForEach(viewModel.sentences) { sentence in
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(sentence.example)
-                            .font(.body.weight(.medium))
-                            .foregroundStyle(Color.primary)
-                        Text(sentence.translation)
-                            .font(.subheadline)
-                            .foregroundStyle(Color.secondary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(12)
-                    .background(Color(.tertiarySystemFill))
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    SentenceCard(
+                        sentence: sentence,
+                        isSpeaking: speakingIdentity == sentence.exampleIdentity,
+                        onSpeak: {
+                            speakingIdentity = sentence.exampleIdentity
+                            defer { speakingIdentity = nil }
+                            try await viewModel.speechTTS(content: sentence.example, identity: sentence.exampleIdentity)
+                        }
+                    )
                 }
             }
         }
@@ -328,6 +336,93 @@ struct DetailView: View {
                     
         }
         
+    }
+}
+
+// MARK: - Sentence Card
+private struct SentenceCard: View {
+    let sentence: DetailViewModel.Sentence
+    let isSpeaking: Bool
+    let onSpeak: () async throws -> Void
+
+    @State private var speakError: Error? = nil
+
+    var body: some View {
+        Button {
+            Task {
+                do {
+                    try await onSpeak()
+                    speakError = nil
+                } catch {
+                    speakError = error
+                }
+            }
+        } label: {
+            HStack(alignment: .top, spacing: 10) {
+                // 스피커 아이콘
+                ZStack {
+                    Circle()
+                        .fill(isSpeaking ? Color.systemBlack : Color.systemBlack.opacity(0.1))
+                        .frame(width: 28, height: 28)
+
+                    if isSpeaking {
+                        Image(systemName: "waveform")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(Color.systemWhite)
+                    } else {
+                        Image(systemName: "speaker.wave.2.fill")
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(Color.systemBlack)
+                    }
+                }
+                .animation(.easeInOut(duration: 0.2), value: isSpeaking)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(sentence.example)
+                        .font(.body.weight(.medium))
+                        .foregroundStyle(Color.primary)
+                        .multilineTextAlignment(.leading)
+                    Text(sentence.translation)
+                        .font(.subheadline)
+                        .foregroundStyle(Color.secondary)
+                        .multilineTextAlignment(.leading)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(12)
+            .background(Color(.tertiarySystemFill))
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .overlay {
+            if speakError != nil {
+                ToastView(message: speakError?.localizedDescription ?? "")
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            withAnimation {
+                                speakError = nil
+                            }
+                        }
+                    }
+            }
+        }
+        .animation(.easeInOut, value: speakError != nil)
+    }
+}
+
+// MARK: - Toast View
+private struct ToastView: View {
+    let message: String
+
+    var body: some View {
+        Text(LocalizedStringKey(message))
+            .font(.caption)
+            .foregroundStyle(.white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(Color.black.opacity(0.85))
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 }
 

@@ -13,7 +13,8 @@ public protocol MainHomeDependencyInjection {
 
     func makeDBImplementation() -> DataBaseProtocol
     func makeSpecchAppleVoiceImplementation() -> SpeechVoiceInterface
-    
+    func makeSpeechVoiceImplementation() -> SpeechVoiceInterface
+
     func maxWordLength() -> Int
     func maxMeaningLength() -> Int
 }
@@ -36,7 +37,11 @@ public class MainHomeMockDIContainer: MainHomeDependencyInjection {
     public func makeSpecchAppleVoiceImplementation() -> SpeechVoiceInterface {
         SpeechVoiceMock()
     }
-    
+
+    public func makeSpeechVoiceImplementation() -> SpeechVoiceInterface {
+        SpeechVoiceMock()
+    }
+
     public func makeDBImplementation() -> DataBaseProtocol {
         return dbService
     }
