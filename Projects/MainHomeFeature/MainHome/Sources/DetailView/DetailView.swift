@@ -82,7 +82,7 @@ struct DetailView: View {
             // 맞춘 횟수
             Text("\(viewModel.correctCount)번 맞춤")
                 .font(.caption)
-                .foregroundStyle(.white)
+                .foregroundStyle(Color.systemWhite)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
                 .background(Color.systemBlack)
@@ -168,7 +168,7 @@ struct DetailView: View {
                     } label: {
                         Label("리뷰하러 가기", systemImage: "arrow.right.circle.fill")
                             .font(.subheadline.weight(.medium))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(Color.systemWhite)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 10)
                             .background(Color.systemBlack)
@@ -220,20 +220,18 @@ struct DetailView: View {
             HStack {
                 Spacer()
                 GlassEffectContainer {
-                    HStack(spacing: 12) {
+                    VStack(spacing: 12) {
                         if isClicked {
                             // 삭제 버튼
                             Button {
                                 viewModel.deleteAlert.toggle()
                             } label: {
-                                Image(systemName: "trash")
-                                    .font(.title3)
+                                Image(systemName: "trash.circle.fill")
+                                    .resizable()
+                                    .frame(width: 40, height: 40)
                                     .foregroundStyle(.red)
-                                    .frame(width: 50, height: 50)
-//                                    .background(.ultraThinMaterial)
-                                    .clipShape(Circle())
                             }
-                            .glassEffect()
+                            .buttonStyle(.glass)
                             .glassEffectID("editButton1", in: namespace)
                             
                             // 수정 버튼
@@ -241,17 +239,16 @@ struct DetailView: View {
                                 viewModel.editSheet.toggle()
                             } label: {
                                 HStack(spacing: 8) {
-                                    Text("수정")
+                                    Image(systemName: "pencil.circle.fill")
+                                        .resizable()
+                                        .frame(width: 40, height: 40)
                                 }
                                 .font(.headline)
                                 .foregroundStyle(Color.systemBlack)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 50)
-                                //                .background(Color.systemBlack)
-                                //                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                .frame(width: 40, height: 40)
                             }
 //                            .buttonStyle(.glass)
-                            .glassEffect()
+                            .buttonStyle(.glass)
                             .glassEffectID("editButton2", in: namespace)
                         }
                         
@@ -263,13 +260,14 @@ struct DetailView: View {
                             }
                         } label: {
                             HStack(spacing: 8) {
-                                Image(systemName: isClicked ? "xmark" : "pencil")
+                                Image(systemName: isClicked ? "xmark.circle.fill" : "ellipsis.circle.fill")
+                                    .resizable()
+                                    .frame(width: 40, height: 40)
                             }
                             .font(.headline)
-                            .foregroundStyle(Color.white)
-                            .frame(width: 50, height: 50)
+                            .foregroundStyle(Color.systemBlack)
                         }
-                        .glassEffect(.regular.tint(Color.systemBlack))
+                        .buttonStyle(.glass)
                         .glassEffectID("editButton", in: namespace)
                         .glassEffectTransition(.matchedGeometry)
 
@@ -311,7 +309,7 @@ struct DetailView: View {
                         Text("수정")
                     }
                     .font(.headline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.systemWhite)
                     .frame(maxWidth: .infinity)
                     .frame(height: 50)
                     //                .background(Color.systemBlack)

@@ -11,73 +11,19 @@ import CommonUI
 
 public struct WordCardView2: View {
 
-    init(viewModel: WordCardViewModel, tagViewModel: ExpandableTagViewModel? = nil) {
+    init(viewModel: WordCardViewModel, tagViewModel: ExpandableTagViewModel? = nil, viewType: Binding<WordCardViewType>) {
         self.viewModel = viewModel
         self.tagViewModel = tagViewModel
+        self._viewType = viewType
     }
 
     @ObservedObject var viewModel: WordCardViewModel
     var tagViewModel: ExpandableTagViewModel?
-    @State private var viewType: WordCardViewType = .all
+    @Binding var viewType: WordCardViewType
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // 헤더
-            VStack(spacing: 12) {
-                // 상단: 제목 + 개수
-                HStack {
-                    Text("단어 목록")
-                        .font(.title2.bold())
-
-                    Spacer()
-
-                    Text("\(viewModel.items.count)개")
-                        .font(.subheadline)
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 4)
-                        .background(Color.accentColor)
-                        .clipShape(Capsule())
-                }
-
-                // 하단: 필터 버튼들
-                HStack(spacing: 8) {
-                    FilterButton(
-                        icon: "eye",
-                        title: viewType.rawValue,
-                        menu: {
-                            ForEach(WordCardViewType.allCases) { type in
-                                Button {
-                                    viewType = type
-                                } label: {
-                                    Label(LocalizedStringKey(type.rawValue), systemImage: viewType == type ? "checkmark" : "")
-                                }
-                            }
-                        }
-                    )
-
-                    FilterButton(
-                        icon: "arrow.up.arrow.down",
-                        title: viewModel.sortType.name,
-                        menu: {
-                            ForEach(WordCardSortFilter.allCases) { type in
-                                Button {
-                                    viewModel.sortType = type
-                                } label: {
-                                    Label(LocalizedStringKey(type.name), systemImage: viewModel.sortType == type ? "checkmark" : "")
-                                }
-                            }
-                        }
-                    )
-
-                    Spacer()
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-
-            // 단어 리스트
-            ScrollView {
+        // 단어 리스트
+        ScrollView {
                 LazyVStack(spacing: 0) {
                     // 태그 필터
                     if let tagVM = tagViewModel {
@@ -92,9 +38,10 @@ public struct WordCardView2: View {
                             }
                         }
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
                 }
             }
-        }
         .onChange(of: viewModel.sortType) { _, _ in
             Task {
                 try? await viewModel.fetchWords(filter: viewModel.filter)
@@ -110,32 +57,6 @@ public struct WordCardView2: View {
     
 }
 
-// 필터 버튼 컴포넌트
-private struct FilterButton<MenuContent: View>: View {
-    let icon: String
-    let title: String
-    @ViewBuilder let menu: () -> MenuContent
-
-    var body: some View {
-        Menu {
-            menu()
-        } label: {
-            HStack(spacing: 6) {
-                Image(systemName: icon)
-                    .font(.caption)
-                Text(LocalizedStringKey(title))
-                    .font(.subheadline)
-                Image(systemName: "chevron.down")
-                    .font(.caption2)
-            }
-            .foregroundStyle(Color.primary)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(Color(.tertiarySystemFill))
-            .clipShape(Capsule())
-        }
-    }
-}
 fileprivate struct WordRowView: View {
 
     var item: CardItem
@@ -184,6 +105,6 @@ fileprivate struct WordRowView: View {
 
 #Preview {
     NavigationStack {
-        WordCardView2(viewModel: WordCardViewModel(dbService: MainHomeMockDIContainer().makeDBImplementation()))
+        WordCardView2(viewModel: WordCardViewModel(dbService: MainHomeMockDIContainer().makeDBImplementation()), viewType: .constant(.all))
     }
 }

@@ -97,7 +97,7 @@ struct ReviewDeckView: View {
                 HStack {
                     Image(systemName: "xmark")
                         .font(.body.weight(.medium))
-                        .foregroundStyle(Color.white)
+                        .foregroundStyle(Color.systemWhite)
                         .frame(width: 36, height: 36)
                         .background(Color.systemBlack)
                         .clipShape(Circle())
@@ -127,12 +127,6 @@ struct ReviewDeckView: View {
                 .background(Color(.tertiarySystemFill))
                 .clipShape(Capsule())
             }
-
-            Spacer()
-
-            // 플레이스홀더 (좌우 균형)
-            Color.clear
-                .frame(width: 36, height: 36)
         }
         .padding(.horizontal, 20)
         .padding(.top, 12)
@@ -187,7 +181,7 @@ struct ReviewDeckView: View {
                 Text("리뷰 종료")
             }
             .font(.headline)
-            .foregroundStyle(.white)
+            .foregroundStyle(Color.systemWhite)
             .frame(maxWidth: .infinity)
             .frame(height: 50)
             .background(Color.systemBlack)

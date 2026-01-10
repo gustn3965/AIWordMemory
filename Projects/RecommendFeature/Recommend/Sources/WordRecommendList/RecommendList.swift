@@ -11,63 +11,63 @@ import CommonUI
 struct RecommendListView: View {
     @State private var orientation = UIDeviceOrientation.unknown
     @StateObject var viewModel: RecommendListViewModel
-    @Namespace var namespace
-    @State private var currentPage = 0
-    @State private var cardHeight: CGFloat = 64
-    
-    
+
     @State var errorAlert: Bool = false
     @State var aiSearchErrorMessage: String = ""
-    
+
     @State var saveAlert: Bool = false
     @State var saveAlertMessage: String = ""
-    
-    private let bottomTabPadding = 20.0
-    
+
     public init(viewModel: RecommendListViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
-    
+
     var body: some View {
-        
         GeometryReader { geometry in
             ZStack {
+                Color(.systemGroupedBackground)
+                    .ignoresSafeArea()
+
                 VStack(spacing: 0) {
-                    recommendCount
-                    listView
-                        .padding(.bottom, 15)
-                    
-                    moreRecommandButton
+                    // 카운트 헤더
+                    HStack {
+                        Text("추천된 단어")
+                            .font(.subheadline)
+                            .foregroundStyle(Color.secondary)
+                        Spacer()
+                        Text("\(viewModel.items.count)개")
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(Color.systemBlack)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 16)
+                    .padding(.bottom, 12)
+
+                    // 리스트
+                    listView(geometry: geometry)
                 }
-                .padding()
                 .allowsHitTesting(!viewModel.isLoading)
-                
+
                 if viewModel.isLoading {
-                    loadingView
-                        .ignoresSafeArea(.all, edges: .all)
+                    loadingOverlay
                 }
             }
-            
+            .safeAreaInset(edge: .bottom) {
+                moreRecommendButton
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(.ultraThinMaterial)
+            }
         }
         .alert(LocalizedStringKey(aiSearchErrorMessage), isPresented: $errorAlert,
-               presenting: aiSearchErrorMessage) { errorMessage in
-            
-        } message: { errorMessage in
-            
-        }
+               presenting: aiSearchErrorMessage) { _ in }
         .alert(LocalizedStringKey(saveAlertMessage), isPresented: $saveAlert,
-               presenting: saveAlert) { errorMessage in
-            
-        } message: { errorMessage in
-            
-        }
+               presenting: saveAlert) { _ in }
         .task {
             do {
                 try await viewModel.firstLoadDB()
-            } catch {
-                
-            }
-            
+            } catch {}
+
             if viewModel.items.isEmpty {
                 do {
                     try await viewModel.fetchRecommend()
@@ -81,237 +81,159 @@ struct RecommendListView: View {
             orientation = newOrientation
         }
     }
-    
-    
-    private var recommendCount: some View {
-        HStack {
-            Spacer()
-            Text("추천된 단어 \(viewModel.items.count)개")
-        }
-        
-    }
-    
-    private var listView: some View {
-        ZStack {
-            BackgroundView()
-            GeometryReader { geometry in
-                let isWideView = UIDevice.current.userInterfaceIdiom == .pad || orientation.isLandscape
-                let maxWidth = isWideView ? geometry.size.width / 2 - 80 : geometry.size.width - 40
-                let columns = isWideView ? [GridItem(.flexible()), GridItem(.flexible())] : [GridItem(.flexible())]
 
-                ScrollView {
-                    LazyVGrid(columns: columns, spacing: 20) {
-                        ForEach(viewModel.items) { item in
-                            CardView2(cardItem: item, saveAction: {
-                                Task {
-                                    do {
-                                        try await viewModel.saveToWordDB(item: item)
-                                        saveAlertMessage = "저장완료"
-                                        saveAlert = true
-                                    } catch {
-                                        saveAlertMessage = error.localizedDescription
-                                        saveAlert = true
-                                    }
+    // MARK: - List View
+    private func listView(geometry: GeometryProxy) -> some View {
+        let isWideView = UIDevice.current.userInterfaceIdiom == .pad || orientation.isLandscape
+        let columns = isWideView ? [GridItem(.flexible()), GridItem(.flexible())] : [GridItem(.flexible())]
+
+        return ScrollView {
+            LazyVGrid(columns: columns, spacing: 12) {
+                ForEach(viewModel.items) { item in
+                    WordCard(
+                        item: item,
+                        saveAction: {
+                            Task {
+                                do {
+                                    try await viewModel.saveToWordDB(item: item)
+                                    saveAlertMessage = "저장완료"
+                                    saveAlert = true
+                                } catch {
+                                    saveAlertMessage = error.localizedDescription
+                                    saveAlert = true
                                 }
-                            }, speekAction: {
-                                Task {
-                                    do {
-                                        try await viewModel.speechAppleTTS(content: item.word)
-                                    } catch {
-                                        // 에러 처리
-                                    }
-                                }
-                            })
-                            .frame(maxWidth: maxWidth)
+                            }
+                        },
+                        speakAction: {
+                            Task {
+                                try? await viewModel.speechAppleTTS(content: item.word)
+                            }
                         }
-                    }
-                    .padding()
+                    )
                 }
             }
-
-            // ✅ 흠, tabView & page일때, 한페이지내에서 카드가 서로 다른 높이일떄 계속 호출돼서 앱이먹통됌...
-            
-//            GeometryReader { geometry in
-//                let isWideView = UIDevice.current.userInterfaceIdiom == .pad || orientation.isLandscape
-//                
-//                let itemsPerPage = max(1, Int((geometry.size.height - bottomTabPadding) / (cardHeight + 20))) * (isWideView ? 2 : 1) // cardHeight + 간격
-//                
-//                let maxWidth = isWideView ? geometry.size.width / 2 - 80 : geometry.size.width - 40
-//                let gridItems = isWideView ? [GridItem(.flexible(maximum: maxWidth)), GridItem(.flexible(maximum: maxWidth))] : [GridItem(.adaptive(minimum: 100, maximum: .infinity))]
-////                let _ = print("????? \(currentPage)")
-//                VStack {
-//                    Color.clear.frame(height: 10)
-//                    TabView(selection: $currentPage) {
-//                        ForEach(0..<(viewModel.items.count + itemsPerPage - 1) / itemsPerPage, id: \.self) { pageIndex in
-//                            VStack {
-////                                let _ = print("????? \(pageIndex)")
-//                                LazyVGrid(columns: gridItems, spacing: 20) {
-//                                    ForEach(viewModel.items[pageIndex * itemsPerPage..<min((pageIndex + 1) * itemsPerPage, viewModel.items.count)]) { item in
-//                                        CardView2(cardItem: item, saveAction: {
-//                                            Task {
-//                                                do {
-//                                                    try await viewModel.saveToWordDB(item: item)
-//                                                    saveAlertMessage = "저장완료"
-//                                                    saveAlert = true
-//                                                } catch {
-//                                                    saveAlertMessage = error.localizedDescription
-//                                                    saveAlert = true
-//                                                }
-//                                                
-//                                            }
-//                                        }, speekAction: {
-//                                            Task {
-//                                                do {
-//                                                    try await viewModel.speechAppleTTS(content: item.word)
-//                                                } catch {
-//                                                    
-//                                                }
-//                                            }
-//                                        })
-////                                        .reportHeight()
-//                                            
-//                                    }
-//                                }
-//                                Spacer()
-//                            }
-//                            .tag(pageIndex)
-//                            
-//                        }
-//                                            .padding(.bottom, bottomTabPadding)
-//                    }
-//                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
-//                    .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
-////                    Color.clear.frame(height: 10)
-//                }
-//                
-//            }
-        }
-        .padding(EdgeInsets(top: 15, leading: 0, bottom: 0, trailing: 0))
-        .onPreferenceChange(CardHeightPreferenceKey.self) { height in
-            MainActor.assumeIsolated() {
-                if self.cardHeight != height {
-                    self.cardHeight = height
-                }
-            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 100)
         }
     }
-    
-    private var moreRecommandButton: some View {
+
+    // MARK: - More Recommend Button
+    private var moreRecommendButton: some View {
         Button {
-            print("검색")
             Task {
                 do {
-//                    field = nil
-//                    try await searchAI()
                     try await viewModel.fetchRecommend()
                 } catch {
                     errorAlert = true
                     aiSearchErrorMessage = error.localizedDescription
                 }
             }
-            
-            
         } label: {
-            Text("AI 추천받기")
+            HStack(spacing: 8) {
+                Image(systemName: "sparkles")
+                Text("AI 추천받기")
+            }
+            .font(.headline)
+            .foregroundStyle(Color.systemWhite)
+            .frame(maxWidth: .infinity)
+            .frame(height: 50)
+            .background(Color.systemBlack)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
-        .frame(height: 50)
-        .buttonStyle(WMButtonStyle())
-        .padding(.bottom, orientation.isLandscape ? 0 : 10)
-//        .background(offsetReader(for: \.searchButton))
     }
-    
-    private var loadingView: some View {
+
+    // MARK: - Loading Overlay
+    private var loadingOverlay: some View {
         ZStack {
-            Color.black.opacity(0.3)
-                .frame(width: 250, height: 250)
-                .cornerRadius(20)
-            Color.systemWhite.opacity(0.7)
-                .frame(width: 200, height: 200)
-                .cornerRadius(20)
-            
-            VStack {
-                Text("AI 생성중입니다...")
+            Color.black.opacity(0.4)
+                .ignoresSafeArea()
+
+            VStack(spacing: 16) {
+                ZStack {
+                    Circle()
+                        .fill(Color.systemBlack.opacity(0.1))
+                        .frame(width: 60, height: 60)
+
+                    Image("ph_open-ai-logo-light", bundle: CommonUIResources.bundle)
+                        .resizable()
+                        .frame(width: 30, height: 30)
+                        .rotationEffect(Angle(degrees: viewModel.shouldAnimateLogo ? 360 : 0))
+                        .animation(viewModel.shouldAnimateLogo ? Animation.linear(duration: 1).repeatForever(autoreverses: false) : .default, value: viewModel.shouldAnimateLogo)
+                }
+
+                Text("AI 생성중...")
                     .font(.headline)
-                Image("ph_open-ai-logo-light", bundle: CommonUIResources.bundle)
-                    .resizable()
-                    .frame(width: 25, height: 25)
-                    .rotationEffect(Angle(degrees: viewModel.shouldAnimateLogo ? 360 : 0))
-                    .animation(viewModel.shouldAnimateLogo ? Animation.linear(duration: 1).repeatForever(autoreverses: false) : .default, value: viewModel.shouldAnimateLogo)
+                    .foregroundStyle(Color.primary)
             }
+            .padding(32)
+            .background(Color(.secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         }
     }
 }
 
+// MARK: - Word Card
+private struct WordCard: View {
+    let item: RecommendWordModel
+    let saveAction: () -> Void
+    let speakAction: () -> Void
 
-fileprivate struct CardView2: View {
-    
-    var item: RecommendWordModel
-    var saveAction: (() -> Void)
-    var speekAction: (() -> Void)
-    init(cardItem: RecommendWordModel, saveAction: @escaping (() -> Void), speekAction: @escaping (() -> Void)) {
-        self.item = cardItem
-        self.saveAction = saveAction
-        self.speekAction = speekAction
-    }
-    
     var body: some View {
-        
-        ZStack {
-            Color.element
-                .cornerRadius(20)
-                .northWestShadow(radius:1, offset: 2)
-            HStack {
-                
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text(item.word)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(item.word)
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(Color.primary)
+                        .lineLimit(2)
+
+                    Text(item.meaning)
+                        .font(.subheadline)
+                        .foregroundStyle(Color.secondary)
+                        .lineLimit(3)
+                }
+
+                Spacer()
+
+                HStack(spacing: 8) {
+                    // 발음 버튼
+                    Button {
+                        speakAction()
+                    } label: {
+                        Image(systemName: "speaker.wave.2.fill")
+                            .font(.subheadline)
                             .foregroundStyle(Color.systemBlack)
-                            .font(.headline)
-                            .lineLimit(5)
-                        Text(item.meaning)
-                            .foregroundStyle(Color.systemBlack)
-                            .font(.body)
-                            .lineLimit(5)
+                            .frame(width: 36, height: 36)
+                            .background(Color.systemBlack.opacity(0.1))
+                            .clipShape(Circle())
                     }
-                    Spacer()
-                }
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    speekAction()
-                }
-                Button {
-                    saveAction()
-                } label: {
-                    Image(systemName: "square.and.arrow.down")
-                        .frame(width: 20, height: 20)
+
+                    // 저장 버튼
+                    Button {
+                        saveAction()
+                    } label: {
+                        Image(systemName: "square.and.arrow.down")
+                            .font(.subheadline)
+                            .foregroundStyle(Color.systemWhite)
+                            .frame(width: 36, height: 36)
+                            .background(Color.systemBlack)
+                            .clipShape(Circle())
+                    }
                 }
             }
-            .padding(EdgeInsets.init(top: 7, leading: 15, bottom: 7, trailing: 15))
+        }
+        .padding(16)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .contentShape(Rectangle())
+        .onTapGesture {
+            speakAction()
         }
     }
 }
-struct CardHeightPreferenceKey: PreferenceKey {
-    nonisolated(unsafe) static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = max(value, nextValue())
-    }
-}
-
-extension View {
-    func reportHeight() -> some View {
-        
-        self.background(GeometryReader { geometry in
-            let _ = print(geometry.size.height)
-            Color.clear.preference(key: CardHeightPreferenceKey.self, value: geometry.size.height)
-        })
-    }
-}
-
-
-
 
 struct RecommendListView_Preview: PreviewProvider {
-    
+
     static var previews: some View {
         RecommendListView(viewModel: RecommendListViewModel.makeMock())
     }

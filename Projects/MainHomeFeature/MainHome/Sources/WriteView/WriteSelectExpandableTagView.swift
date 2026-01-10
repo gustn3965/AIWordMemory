@@ -153,7 +153,7 @@ private struct WriteTagChip: View {
                 Text(title)
                     .font(.subheadline)
             }
-            .foregroundStyle(isSelected ? .white : Color.primary)
+            .foregroundStyle(isSelected ? Color.systemWhite : Color.primary)
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .background(isSelected ? Color.systemBlack : Color(.tertiarySystemFill))

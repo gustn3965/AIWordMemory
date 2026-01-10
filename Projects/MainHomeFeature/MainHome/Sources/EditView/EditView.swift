@@ -165,7 +165,7 @@ private struct ConfirmButton: View {
         } label: {
             Text("저장")
                 .font(.headline)
-                .foregroundStyle(.white)
+                .foregroundStyle(Color.systemWhite)
                 .frame(maxWidth: .infinity)
                 .frame(height: 50)
                 .background(Color.systemBlack)

@@ -15,7 +15,8 @@ public struct MainHomeView: View {
     @StateObject private var viewModel: MainHomeViewModel
     @Environment(\.isSearching) private var isSearching
     @Namespace private var namespace
-    
+    @State private var viewType: WordCardViewType = .all
+
     private let diContainer: any MainHomeDependencyInjection
     
     
@@ -33,13 +34,94 @@ public struct MainHomeView: View {
                 NavigationStack {
                     mainList(geometry: geometry)
                         .searchable(text: $viewModel.searchText,
-                                    placement: .navigationBarDrawer(displayMode: .automatic),
+                                    placement: .toolbar,
                                     prompt: "작성한 단어, 뜻을 검색해보세요.")
+                        
                         .navigationDestination(for: CardItem.self) { cardItem in
                             DetailView(diContainer: diContainer, wordIdentity: cardItem.id, appCoordinator: appCoordinator)
                         }
                         .listStyle(.plain)
-                        .navigationTitle("AI Word")
+//                        .navigationTitle("AI Word")
+                        .versioned { view in
+                            if #available(iOS 26.0, *) {
+                                view
+                                    .searchToolbarBehavior(.minimize)
+                                    .toolbar {
+//                                        DefaultToolbarItem(kind: .search, placement: .topBarLeading)
+                                        ToolbarItem(placement: .topBarLeading) {
+                                                // 보기 필터
+                                                Menu {
+                                                    ForEach(WordCardViewType.allCases) { type in
+                                                        Button {
+                                                            viewType = type
+                                                        } label: {
+                                                            Label(LocalizedStringKey(type.rawValue), systemImage: viewType == type ? "checkmark" : "")
+                                                        }
+                                                    }
+                                                } label: {
+                                                    Image(systemName: "eye.circle.fill")
+                                                        .font(.body)
+                                                        .foregroundStyle(Color.systemBlack)
+                                                }
+                                        }
+//                                        ToolbarSpacer(.fixed, placement: .topBarLeading)
+                                        ToolbarItem(placement: .topBarLeading) {
+                                                // 정렬 필터
+                                                Menu {
+                                                    ForEach(WordCardSortFilter.allCases) { type in
+                                                        Button {
+                                                            viewModel.wordCardviewModel.sortType = type
+                                                        } label: {
+                                                            Label(LocalizedStringKey(type.name), systemImage: viewModel.wordCardviewModel.sortType == type ? "checkmark" : "")
+                                                        }
+                                                    }
+                                                } label: {
+                                                    Image(systemName: "arrow.up.arrow.down.circle.fill")
+                                                        .font(.body)
+                                                        .foregroundStyle(Color.systemBlack)
+                                                }
+                                        }
+                                    }
+                            } else {
+                                view
+                                    .toolbar {
+                                        ToolbarItem(placement: .topBarTrailing) {
+                                                // 보기 필터
+                                                Menu {
+                                                    ForEach(WordCardViewType.allCases) { type in
+                                                        Button {
+                                                            viewType = type
+                                                        } label: {
+                                                            Label(LocalizedStringKey(type.rawValue), systemImage: viewType == type ? "checkmark" : "")
+                                                        }
+                                                    }
+                                                } label: {
+                                                    Image(systemName: "eye.circle.fill")
+                                                        .font(.body)
+                                                        .foregroundStyle(Color.systemBlack)
+                                                }
+                                        }
+                                        
+            //                            ToolbarSpacer(.fixed)
+                                        ToolbarItem(placement: .topBarTrailing) {
+                                                // 정렬 필터
+                                                Menu {
+                                                    ForEach(WordCardSortFilter.allCases) { type in
+                                                        Button {
+                                                            viewModel.wordCardviewModel.sortType = type
+                                                        } label: {
+                                                            Label(LocalizedStringKey(type.name), systemImage: viewModel.wordCardviewModel.sortType == type ? "checkmark" : "")
+                                                        }
+                                                    }
+                                                } label: {
+                                                    Image(systemName: "arrow.up.arrow.down.circle.fill")
+                                                        .font(.body)
+                                                        .foregroundStyle(Color.systemBlack)
+                                                }
+                                        }
+                                    }
+                            }
+                        }
                         .onChange(of: viewModel.searchText, { _, newValue in handleSearchTextChange(newValue: newValue) })
                         .onSubmit(of: .search, { handleSearchSubmit() })
                         .overlay(alignment: .bottomTrailing) {
@@ -101,7 +183,8 @@ public struct MainHomeView: View {
             } else {
                 WordCardView2(
                     viewModel: viewModel.wordCardviewModel,
-                    tagViewModel: viewModel.needTopExpandableTagView ? viewModel.tagViewModel : nil
+                    tagViewModel: viewModel.needTopExpandableTagView ? viewModel.tagViewModel : nil,
+                    viewType: $viewType
                 )
             }
         }
@@ -109,16 +192,18 @@ public struct MainHomeView: View {
     
     private var addButton: some View {
         Button(action: { viewModel.addWordSheet.toggle() }) {
-            Image(systemName: "plus")
+            Image(systemName: "pencil.circle.fill")
                 .versioned { view in
                     if #available(iOS 26.0, *) {
                         view
-                            .foregroundStyle(Color.white)
-                        .frame(width: 56, height: 56)
+                            .resizable()
+                            .foregroundStyle(Color.systemBlack)
+                            .frame(width: 40, height: 40)
+                        
                     } else {
                         view.font(.title2.weight(.semibold))
                             .foregroundStyle(Color.accentColor)
-                            .frame(width: 56, height: 56)
+                            .frame(width: 40, height: 40)
                             .background(Color.systemWhite)
                             .clipShape(Circle())
                                         .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
@@ -129,7 +214,8 @@ public struct MainHomeView: View {
         .versioned { view in
             if #available(iOS 26.0, *) {
                 view
-                    .glassEffect(.regular.tint(Color.systemBlack))
+//                    .glassEffect(.regular.tint(Color.systemBlack))
+                    .buttonStyle(.glass)
             } else {
                 view
             }

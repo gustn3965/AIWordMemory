@@ -9,233 +9,228 @@ import SwiftUI
 import CommonUI
 
 public struct WordCollectionView: View {
-    
+
     @StateObject var viewModel: WordCollectionViewModel
     @AppStorage("aiSearchLanguageCodeType") private var aiUserLanguageCodeType = Locale.current.language.languageCode?.identifier ?? "en"
     @AppStorage("aiRecommendInfoOnboarding") private var aiRecommendInfoOnboarding = true
-    @Namespace var namespace
-    
+
     @State var infoAlert: Bool = false
-    let infoText: String = "AI에서 추천하는 단어로써 단어가 부족할 수 있습니다. 참고용으로 사용하세요.☺️"
-    
+    let infoText: String = "AI에서 추천하는 단어로써 단어가 부족할 수 있습니다. 참고용으로 사용하세요."
+
     public init(diContainer: RecommendDependencyInjection) {
         _viewModel = StateObject(wrappedValue: WordCollectionViewModel(diContainer: diContainer))
     }
-    
+
     public var body: some View {
         NavigationStack {
-            VStack {
-                ScrollView {
-                    VStack {
-                        userLanguagePicker
-                            .fixedSize(horizontal: false, vertical: true)
-                            .padding(.bottom, 10)
-                        languageTab
-                            .fixedSize(horizontal: false, vertical: true)
-                            .padding(.bottom, 10)
-                        
-                        levelListView
-                            .fixedSize(horizontal: false, vertical: true)
-                        
-                        Spacer()
-                    }
-                    .padding(20)
+            ScrollView {
+                VStack(spacing: 16) {
+                    // 헤더
+                    headerSection
+
+                    // 설명 언어 설정
+                    settingsCard
+
+                    // 언어 탭
+                    languageTabSection
+
+                    // 레벨 리스트
+                    levelListCard
                 }
-                
-                .scrollBounceBehavior(.basedOnSize)
-//                .navigationTitle("AI단어추천")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        HStack {
-                            Text("AI단어추천")
-                                .font(.headline)
-                            Button(action: {
-                                infoAlert.toggle()
-                            }) {
-                                Image(systemName: "info.circle")
-                            }
-                        }
-                    }
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+                .padding(.bottom, 20)
+            }
+            .background(Color(.systemGroupedBackground))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("AI단어추천")
+                        .font(.headline)
                 }
-                .alert(LocalizedStringKey(infoText), isPresented: $infoAlert,
-                       presenting: infoText) { errorMessage in
+                ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        aiRecommendInfoOnboarding = false
-                    } label: {
-                        Text("확인")
-                    }
-                }
-                .navigationDestination(item: $viewModel.selectLanguageLevelType, destination: { menu in
-                    if let listViewModel = viewModel.makeRecommendListViewModel() {
-                        RecommendListView(viewModel: listViewModel)
-                            .navigationTitle(LocalizedStringKey(viewModel.selectLanguageLevelType?.levelFullName ?? ""))
-                    } else {
-                        Text("")
-                    }
-                    
-                })
-                .task {
-                    if aiRecommendInfoOnboarding {
                         infoAlert.toggle()
+                    } label: {
+                        Image(systemName: "info.circle")
+                            .foregroundStyle(Color.systemBlack)
                     }
-                    viewModel.updateUserDefaultUserLanguageCode(code: aiUserLanguageCodeType)
-                    
                 }
             }
+            .alert(LocalizedStringKey(infoText), isPresented: $infoAlert,
+                   presenting: infoText) { _ in
+                Button {
+                    aiRecommendInfoOnboarding = false
+                } label: {
+                    Text("확인")
+                }
+            }
+            .navigationDestination(item: $viewModel.selectLanguageLevelType) { menu in
+                if let listViewModel = viewModel.makeRecommendListViewModel() {
+                    RecommendListView(viewModel: listViewModel)
+                        .navigationTitle(LocalizedStringKey(viewModel.selectLanguageLevelType?.levelFullName ?? ""))
+                } else {
+                    Text("")
+                }
+            }
+            .task {
+                if aiRecommendInfoOnboarding {
+                    infoAlert.toggle()
+                }
+                viewModel.updateUserDefaultUserLanguageCode(code: aiUserLanguageCodeType)
+            }
         }
-        
     }
-    
-    private var userLanguagePicker: some View {
-        ZStack {
-            BackgroundView()
-            
-            
+
+    // MARK: - Header Section
+    private var headerSection: some View {
+        VStack(spacing: 8) {
+            ZStack {
+                Circle()
+                    .fill(Color.systemBlack.opacity(0.1))
+                    .frame(width: 56, height: 56)
+
+                Image("ph_open-ai-logo-light", bundle: CommonUIResources.bundle)
+                    .resizable()
+                    .frame(width: 28, height: 28)
+            }
+
+            Text("레벨별 단어 추천")
+                .font(.title2.bold())
+                .foregroundStyle(Color.primary)
+
+            Text("AI가 레벨에 맞는 단어를 추천합니다")
+                .font(.subheadline)
+                .foregroundStyle(Color.secondary)
+        }
+        .padding(.vertical, 8)
+    }
+
+    // MARK: - Settings Card
+    private var settingsCard: some View {
+        VStack(spacing: 0) {
             HStack {
-                Text("설명 언어:")
-                    .padding(.leading)
+                Label {
+                    Text("설명 언어")
+                        .font(.body)
+                        .foregroundStyle(Color.primary)
+                } icon: {
+                    Image(systemName: "text.bubble")
+                        .font(.body)
+                        .foregroundStyle(Color.systemBlack)
+                }
+
+                Spacer()
+
                 Picker("", selection: $viewModel.userLanguage) {
-                    ForEach(viewModel.languageList) { (language) in
+                    ForEach(viewModel.languageList) { language in
                         Text(LocalizedStringKey(language.name))
                             .tag(language)
-                            .font(.headline)
                     }
                 }
                 .tint(Color.systemBlack)
                 .pickerStyle(.menu)
                 .onChange(of: viewModel.userLanguage) { _, newValue in
-                    // 여기에 선택이 변경될 때 실행할 코드를 작성합니다.
                     aiUserLanguageCodeType = newValue.rawValue
                 }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+        }
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    // MARK: - Language Tab Section
+    private var languageTabSection: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 4) {
+                ForEach(viewModel.languageTabList) { language in
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            viewModel.selectLanguageTab = language
+                        }
+                    } label: {
+                        Text(LocalizedStringKey(language.name))
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(viewModel.selectLanguageTab == language ? Color.systemWhite : Color.primary)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .background(
+                                viewModel.selectLanguageTab == language
+                                    ? Color.systemBlack
+                                    : Color.clear
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(4)
+        }
+        .scrollBounceBehavior(.basedOnSize)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+
+    // MARK: - Level List Card
+    private var levelListCard: some View {
+        VStack(spacing: 0) {
+            // 헤더
+            HStack {
+                Text(LocalizedStringKey(viewModel.selectLanguageTab.name))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.secondary)
                 Spacer()
             }
-            .padding(10)
-//            .background(offsetReader(for: \.explanationLanguage))
-            
-        }
-    }
-    
-    private var languageTab: some View {
-        ZStack {
-            BackgroundView()
-            
-            ScrollView(.horizontal) {
-                HStack(spacing: 0) {
-                    ForEach(viewModel.languageTabList) { language in
-                        TabBarItemView(tabBarName: language.name,
-                                       isSelected: viewModel.selectLanguageTab == language,
-                                       namespace: namespace) {
-                            viewModel.selectLanguageTab = language
-                            print("select :\(language.name)")
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+
+            Divider()
+                .padding(.leading, 16)
+
+            // 레벨 리스트
+            ForEach(Array(viewModel.selectLanguageTab.levelTypes.enumerated()), id: \.element.id) { index, item in
+                Button {
+                    viewModel.selectLanguageLevelType = item
+                } label: {
+                    HStack(spacing: 12) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(LocalizedStringKey(item.levelFullName))
+                                .font(.body.weight(.medium))
+                                .foregroundStyle(Color.primary)
+                            Text(LocalizedStringKey(item.levelDescription))
+                                .font(.caption)
+                                .foregroundStyle(Color.secondary)
+                                .lineLimit(2)
+                                .multilineTextAlignment(.leading)
                         }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Color(.tertiaryLabel))
                     }
-                    Spacer()
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+
+                if index != viewModel.selectLanguageTab.levelTypes.count - 1 {
+                    Divider()
+                        .padding(.leading, 16)
                 }
             }
-            .scrollBounceBehavior(.basedOnSize)
-            .scrollIndicators(.hidden)
         }
-    }
-    
-    private var levelListView: some View {
-        
-        ZStack {
-            BackgroundView()
-            
-            
-            
-            VStack {
-                Color.clear.frame(height: 10)
-                Text(LocalizedStringKey(viewModel.selectLanguageTab.name))
-                    .font(.headline)
-                ForEach(Array(viewModel.selectLanguageTab.levelTypes.enumerated()), id: \.element.id) { index, item in
-                    VStack(alignment: .leading) {
-                        
-                        Button {
-                            viewModel.selectLanguageLevelType = item
-                            //                            onItemTap?(item)
-                            //                            print("on Tap Cell \(item.name )")
-                        } label: {
-                            HStack {
-                                
-                                VStack(alignment: .leading) {
-                                    Text(LocalizedStringKey(item.levelFullName))
-                                        .font(.headline)
-                                    Text(LocalizedStringKey(item.levelDescription))
-                                        .font(.body)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                        .lineLimit(10)
-                                }
-                                Spacer() // 버튼으로바꾸거나해야겠다.
-                                
-                                Image(systemName: "chevron.right")
-                            }
-                            .contentShape(Rectangle())
-                        }
-                        
-                        .buttonStyle(WMPressedStyle(doNotChangeBackground: true))
-                        .padding(10)
-                        if index != viewModel.selectLanguageTab.levelTypes.count - 1 {
-                            Divider()
-                                .padding([.leading, .trailing], 10)
-                        }
-                    }
-                    .padding([.leading, .trailing], 20)
-                    .onTapGesture {
-                        //                            onItemTap?(item)
-                    }
-                }
-                Color.clear.frame(height: 10)
-            }
-            
-        }
-//        .animation(.easeIn, value: viewModel.selectLanguageTab)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
-
-struct TabBarItemView: View {
-    var tabBarName: String
-    var isSelected: Bool
-    let namespace: Namespace.ID
-    var action: (() -> Void)
-    
-    var body: some View {
-        VStack {
-            Button {
-                action()
-            } label: {
-                Text(LocalizedStringKey(tabBarName))
-                    .font(.headline)
-            }
-            .buttonStyle(WMPressedStyle())
-            .padding([.top], 13)
-            .padding(.bottom, 3)
-            .padding([.trailing, .leading], 20)
-            
-            Group {
-                if isSelected {
-                    Color.systemBlack
-                        .frame(height: 2.5)
-                        .matchedGeometryEffect(id: "underline", in: namespace.self)
-                        .opacity(isSelected ? 1 : 0)
-                } else {
-                    Color.clear
-                        .frame(height: 2.5)
-                }
-            }
-            .padding([.leading, .trailing], 7)
-            .padding(.bottom, 10)
-        }
-        .fixedSize()
-        .animation(.spring(), value: isSelected)
-    }
-}
-
-
 
 struct WordCollectionView_Preview: PreviewProvider {
-    
+
     static var previews: some View {
         WordCollectionView(diContainer: RecommendMockDIContainer())
     }

@@ -58,11 +58,11 @@ struct ReviewStartView: View {
                         .background(.ultraThinMaterial)
                 }
                 .coordinateSpace(name: "VStack")
-                .allowsHitTesting(!showOnboarding)
+//                .allowsHitTesting(!showOnboarding)
 
-                if showOnboarding {
-                    tooltipOverlay(geometry: geometry)
-                }
+//                if showOnboarding {
+//                    tooltipOverlay(geometry: geometry)
+//                }
             }
         }
         .fullScreenCover(isPresented: $viewModel.startReview) {
@@ -199,7 +199,7 @@ struct ReviewStartView: View {
                 Text(LocalizedStringKey(viewModel.reviewStartButtonName))
             }
             .font(.headline)
-            .foregroundStyle(.white)
+            .foregroundStyle(Color.systemWhite)
             .frame(maxWidth: .infinity)
             .frame(height: 50)
             .background(Color.systemBlack)

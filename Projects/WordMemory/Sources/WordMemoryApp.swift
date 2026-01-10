@@ -126,6 +126,13 @@ struct ContentView: View {
                     settingsTab()
                 }
                 .tabViewStyle(.sidebarAdaptable)
+                .versioned { view in
+                    if #available(iOS 26.0, *) {
+                        view.tabBarMinimizeBehavior(.onScrollDown)
+                    } else {
+                        view
+                    }
+                }
                 .tint(.systemBlack)
                 .edgesIgnoringSafeArea(.all)
             } else {
@@ -172,39 +179,51 @@ struct ContentView: View {
     }
     
     @State var searchType: SearchType = .word
-    @Namespace var namespace
     private var searchTab: some View {
-        VStack {
-            ZStack {
-                BackgroundView()
-                
-                ScrollView(.horizontal) {
-                    HStack(spacing: 0) {
-                        ForEach(SearchType.allCases) { language in
-                            TabBarItemView(tabBarName: language.name,
-                                           isSelected: searchType == language,
-                                           namespace: namespace) {
-                                searchType = language
-                                print("select :\(language.name)")
-                            }
+        VStack(spacing: 0) {
+            // 세그먼트 탭바
+            HStack(spacing: 4) {
+                ForEach(SearchType.allCases) { type in
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            searchType = type
                         }
-                        Spacer()
+                    } label: {
+                        Text(LocalizedStringKey(type.name))
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(searchType == type ? Color.systemWhite : Color.primary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(
+                                searchType == type
+                                    ? Color.systemBlack
+                                    : Color.clear
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                            .contentShape(.rect)
                     }
+                    .buttonStyle(.plain)
                 }
-                .scrollBounceBehavior(.basedOnSize)
             }
-            .fixedSize()
-            .zIndex(0)
-            
-            ZStack { // if searchType 조건문하면 계속 매번 초기화됨 ;
+            .padding(4)
+            .background(Color(.secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 8)
+            .background(Color(.systemGroupedBackground))
+
+            // 콘텐츠
+            ZStack {
                 searchWordTab
-                    .id("asdvzxcvzxcv")
+                    .id("searchWordTab")
                     .opacity(searchType == .word ? 1 : 0)
                 searchSentenceInspectorTab
-                    .id("0-asdfa")
+                    .id("searchSentenceTab")
                     .opacity(searchType == .word ? 0 : 1)
             }
         }
+        .background(Color(.systemGroupedBackground))
         .tabItem {
             VStack {
                 Image("mingcute_search-ai-fill-light", bundle: CommonUIResources.bundle)
@@ -332,45 +351,6 @@ struct ContentView: View {
                 return "문장검사"
             }
         }
-    }
-}
-
-
-struct TabBarItemView: View {
-    var tabBarName: String
-    var isSelected: Bool
-    let namespace: Namespace.ID
-    var action: (() -> Void)
-    
-    var body: some View {
-        VStack {
-            Button {
-                action()
-            } label: {
-                Text(LocalizedStringKey(tabBarName))
-                    .font(.headline)
-            }
-            .buttonStyle(WMPressedStyle())
-            .padding([.top], 13)
-            .padding(.bottom, 3)
-            .padding([.trailing, .leading], 20)
-            
-            Group {
-                if isSelected {
-                    Color.systemBlack
-                        .frame(height: 2.5)
-                        .matchedGeometryEffect(id: "underline", in: namespace.self)
-                        .opacity(isSelected ? 1 : 0)
-                } else {
-                    Color.clear
-                        .frame(height: 2.5)
-                }
-            }
-            .padding([.leading, .trailing], 7)
-            .padding(.bottom, 10)
-        }
-        .fixedSize()
-        .animation(.spring(), value: isSelected)
     }
 }
 

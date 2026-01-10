@@ -9,10 +9,9 @@ import Foundation
 import SwiftUI
 import CommonUI
 
-
 public struct SearchView: View {
     @State private var orientation = UIDeviceOrientation.unknown
-    
+
     @StateObject var viewModel: SearchViewModel
     @FocusState private var field: Field?
     @State var aiSearchErrorMessage: String = ""
@@ -20,435 +19,371 @@ public struct SearchView: View {
     @State var wordSaveAlert: Bool = false
     @State var wordSaveErrorMessage: String = ""
     @State var didSuccessSaveWord: Bool = false
-    
+
     @AppStorage("aiSearchLanguageCodeType") private var aiUserLanguageCodeType = Locale.current.language.languageCode?.identifier ?? "en"
     @AppStorage("aiSearchSearchLanguageCodeType") private var aiSearchLanguageCodeType = "ko"
-    
+
     @AppStorage("showOnBoardingSearch") private var showOnboarding = true
     @State private var onboardingHintType: OnboardingHintType? = .explanationLanguage
-    // MARK: - Layout
     @State private var offsets = OffsetValues()
-    
+
     public init(diContainer: SearchDependencyInjection) {
         _viewModel = StateObject(wrappedValue: SearchViewModel(diContainer: diContainer))
     }
-    
+
     var isIphoneLandScape: Bool {
         UIDevice.current.userInterfaceIdiom != .pad && orientation.isLandscape
     }
-    
+
     public var body: some View {
         GeometryReader { geometry in
             ZStack {
-                VStack {
-                    Spacer()
-                    
-                    VStack(alignment: .leading, spacing: 0) {
-                        userLanguagePicker
-                        searchLanguagePicker
-                            .padding(.bottom, 5)
-                        wordInputTextField
-                    }
-                    .padding(.bottom, 10)
-                    
-                    if isIphoneLandScape == false {
-                        aiLogo
-                    }
-                    
-                    if viewModel.isLoading {
-                        placeholderText(geometry: geometry)
-                            .padding()
-                            
-                    } else {
-                        if viewModel.aiResponse != nil {
-                            aiResponseView
-                                .padding()
-                        } else {
-                            
-                            if aiSearchErrorMessage.isEmpty == false {
-                                Text(LocalizedStringKey(aiSearchErrorMessage))
-                                    .font(.headline)
-                                    .padding(.top)
-                            }
+                Color(.systemGroupedBackground)
+                    .ignoresSafeArea()
+
+                ScrollView {
+                    VStack(spacing: 16) {
+                        // 헤더
+                        if !isIphoneLandScape {
+                            headerSection
+                        }
+
+                        // 설정 카드
+                        settingsCard
+
+                        // 검색 입력
+                        searchInputCard
+
+                        // AI 응답
+                        if viewModel.isLoading {
+                            loadingView
+                        } else if let _ = viewModel.aiResponse {
+                            aiResponseCard
+                        } else if !aiSearchErrorMessage.isEmpty {
+                            errorCard
                         }
                     }
-                    
-                    Spacer()
+                    .padding(.horizontal, 16)
+                    .padding(.top, 16)
+                    .padding(.bottom, 100)
+                }
+                .safeAreaInset(edge: .bottom) {
                     searchButton
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .background(.ultraThinMaterial)
                 }
                 .coordinateSpace(name: "VStack")
-                .padding()
                 .contentShape(Rectangle())
-                .transition(.opacity.combined(with: .scale))
-                .animation(.easeInOut(duration: 0.5), value: viewModel.isLoading)
                 .onTapGesture {
                     field = nil
                 }
-                .allowsHitTesting(!showOnboarding)
+//                .allowsHitTesting(!showOnboarding)
+
+//                if showOnboarding {
+//                    tooltipOverlay(geometry: geometry)
+//                }
             }
-            
-            if showOnboarding {
-                
-                tooltipOverlay(geometry: geometry)
-            }
-           
         }
         .onRotate { newOrientation in
             orientation = newOrientation
         }
-        
-        // App에서 탭으로 전환하고있어서 .onAppear이 searchView랑 충돌나서..일단뺌..
-//        .onAppear {
-//            if showOnboarding == false {
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-//                    field = .word
-//                }
-//            }
-//        }
         .task {
             viewModel.updateUserDefaultUserLanguageCode(code: aiUserLanguageCodeType)
             viewModel.updateUserDefaultSearchLanguageCode(code: aiSearchLanguageCodeType)
         }
-        
-        // Test Code
-//        .task {
-//            try? await Task.sleep(nanoseconds: 1_000_000_000)
-//            viewModel.searchWord = "asdfsadf"
-//            try? await Task.sleep(nanoseconds: 1_000_000_000)
-//            
-//            do {
-//                try await viewModel.search()
-//            } catch {
-//                aiSearchErrorMessage = error.localizedDescription
-//            }
-//        }
-        
     }
-    
-    // MARK: - Subviews
-    
-    private var userLanguagePicker: some View {
-        HStack {
-            Text("설명 언어:")
-                .padding(.leading)
-            Picker("", selection: $viewModel.userLanguage) {
-                ForEach(viewModel.languageList) { (language) in
-                    Text(LocalizedStringKey(language.name))
-                        .tag(language)
-                        .font(.headline)
-                }
+
+    // MARK: - Header Section
+    private var headerSection: some View {
+        VStack(spacing: 8) {
+            ZStack {
+                Circle()
+                    .fill(Color.systemBlack.opacity(0.1))
+                    .frame(width: 56, height: 56)
+
+                Image("ph_open-ai-logo-light", bundle: CommonUIResources.bundle)
+                    .resizable()
+                    .frame(width: 28, height: 28)
+                    .rotationEffect(Angle(degrees: viewModel.shouldAnimateLogo ? 360 : 0))
+                    .animation(viewModel.shouldAnimateLogo ? Animation.linear(duration: 1).repeatForever(autoreverses: false) : .default, value: viewModel.shouldAnimateLogo)
             }
-            .tint(Color.systemBlack)
-            .pickerStyle(.menu)
-            .onChange(of: viewModel.userLanguage) { _, newValue in
-                // 여기에 선택이 변경될 때 실행할 코드를 작성합니다.
-                aiUserLanguageCodeType = newValue.rawValue
-                viewModel.updateUserDefaultUserLanguageCode(code: aiUserLanguageCodeType)
-            }
-            Spacer()
+
+            Text("AI 검색")
+                .font(.title2.bold())
+                .foregroundStyle(Color.primary)
+
+            Text("모르는 단어를 AI에게 물어보세요")
+                .font(.subheadline)
+                .foregroundStyle(Color.secondary)
         }
-        .background(offsetReader(for: \.explanationLanguage))
-        
+        .padding(.vertical, 8)
     }
-    
-    private var searchLanguagePicker: some View {
-        HStack {
-            Text("찾고자 하는 언어:")
-                .padding(.leading)
-            Picker("", selection: $viewModel.searchLanguage) {
-                ForEach(viewModel.languageList) { (language) in
-                    Text(LocalizedStringKey(language.name))
-                        .tag(language)
-                        .font(.headline)
+
+    // MARK: - Settings Card
+    private var settingsCard: some View {
+        VStack(spacing: 0) {
+            // 설명 언어
+            HStack {
+                Label {
+                    Text("설명 언어")
+                        .font(.body)
+                        .foregroundStyle(Color.primary)
+                } icon: {
+                    Image(systemName: "text.bubble")
+                        .font(.body)
+                        .foregroundStyle(Color.systemBlack)
                 }
-            }
-            .tint(Color.systemBlack)
-            .pickerStyle(.menu)
-            .onChange(of: viewModel.searchLanguage) { _, newValue in
-                // 여기에 선택이 변경될 때 실행할 코드를 작성합니다.
-                aiSearchLanguageCodeType = newValue.rawValue
-                viewModel.updateUserDefaultSearchLanguageCode(code: aiSearchLanguageCodeType)
-            }
-            Spacer()
-            
-            textCount
-        }
-        .background(offsetReader(for: \.searchLanguage))
-    }
-    
-    private var textCount: some View {
-        Text("\(viewModel.wordCount)/\(viewModel.maxWordCount)")
-            .font(.footnote)
-            .padding(.trailing)
-            .foregroundStyle(field == .word ? Color.systemBlack : Color.gray)
-    }
-    
-    private var wordInputTextField: some View {
-        WMTextField(placeHolder: "검색할 단어를 입력하세요.", text: $viewModel.searchWord)
-        //                .background(offsetReader(for: \.word))
-            .focused($field, equals: .word)
-            .onChange(of: viewModel.searchWord) { oldValue, newValue in
-                updateWordCount(oldValue: oldValue, newValue: newValue)
-                
-                searchButtonEnable = !(viewModel.searchWord.isEmpty || viewModel.searchWord.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                
-            }
-            .onSubmit {
-                Task {
-                    do {
-                        field = nil
-                        try await searchAI()
-                    } catch {
-                        aiSearchErrorMessage = error.localizedDescription
-                        print("?????????????")
+
+                Spacer()
+
+                Picker("", selection: $viewModel.userLanguage) {
+                    ForEach(viewModel.languageList) { language in
+                        Text(LocalizedStringKey(language.name))
+                            .tag(language)
                     }
                 }
+                .tint(Color.systemBlack)
+                .pickerStyle(.menu)
+                .onChange(of: viewModel.userLanguage) { _, newValue in
+                    aiUserLanguageCodeType = newValue.rawValue
+                    viewModel.updateUserDefaultUserLanguageCode(code: aiUserLanguageCodeType)
+                }
             }
-            .background(offsetReader(for: \.inputField))
-    }
-    
-    private var aiLogo: some View {
-        Image("ph_open-ai-logo-light", bundle: CommonUIResources.bundle)
-            .resizable()
-            .frame(width: 25, height: 25)
-            .rotationEffect(Angle(degrees: viewModel.shouldAnimateLogo ? 360 : 0))
-            .animation(viewModel.shouldAnimateLogo ? Animation.linear(duration: 1).repeatForever(autoreverses: false) : .default, value: viewModel.shouldAnimateLogo)
-    }
-    
-    private var aiResponseView: some View {
-        
-        ZStack {
-            cardBackground
-            
-            switch viewModel.aiResponse?.searchType {
-            case .meaning:
-                examplesMeaningScrollView()
-            case .translate:
-                examplesTranslateScrollView()
-            case nil:
-                Text("")
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(offsetReader(for: \.explanationLanguage))
+
+            Divider()
+                .padding(.leading, 52)
+
+            // 검색 언어
+            HStack {
+                Label {
+                    Text("검색 언어")
+                        .font(.body)
+                        .foregroundStyle(Color.primary)
+                } icon: {
+                    Image(systemName: "magnifyingglass")
+                        .font(.body)
+                        .foregroundStyle(Color.systemBlack)
+                }
+
+                Spacer()
+
+                Picker("", selection: $viewModel.searchLanguage) {
+                    ForEach(viewModel.languageList) { language in
+                        Text(LocalizedStringKey(language.name))
+                            .tag(language)
+                    }
+                }
+                .tint(Color.systemBlack)
+                .pickerStyle(.menu)
+                .onChange(of: viewModel.searchLanguage) { _, newValue in
+                    aiSearchLanguageCodeType = newValue.rawValue
+                    viewModel.updateUserDefaultSearchLanguageCode(code: aiSearchLanguageCodeType)
+                }
             }
-            
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(offsetReader(for: \.searchLanguage))
         }
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
-    
-    
-    private func examplesMeaningScrollView() -> some View {
-        return Group {
-            GeometryReader { geometry in
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
-                        
-                        if let aiResponse = viewModel.aiResponse {
-                            VStack(alignment: .leading) {
-                                Text("부연설명:")
-                                    .font(.headline)
-                                Text(aiResponse.explanation)
-                                    .font(.body)
-                                    .contextMenu(ContextMenu(menuItems: {
-                                        Button("Copy", action: {
-                                          UIPasteboard.general.string = aiResponse.explanation
-                                        })
-                                      }))
-                            }
-                            VStack(alignment: .leading) {
-                                Text("예시:")
-                                    .font(.headline)
-                                Text(aiResponse.sentence)
-                                    .font(.body)
-                                    .contextMenu(ContextMenu(menuItems: {
-                                        Button("Copy", action: {
-                                          UIPasteboard.general.string = aiResponse.sentence
-                                        })
-                                      }))
-                            }
-                            VStack(alignment: .leading) {
-                                Text("해석:")
-                                    .font(.headline)
-                                Text(aiResponse.sentenceTranslation)
-                                    .font(.body)
-                                    .contextMenu(ContextMenu(menuItems: {
-                                        Button("Copy", action: {
-                                          UIPasteboard.general.string = aiResponse.sentenceTranslation
-                                        })
-                                      }))
-                            }
-                            VStack(alignment: .leading) {
-                                Text("뜻:")
-                                    .font(.headline)
-                                Text(aiResponse.meaning)
-                                    .font(.body)
-                                    .contextMenu(ContextMenu(menuItems: {
-                                        Button("Copy", action: {
-                                          UIPasteboard.general.string = aiResponse.meaning
-                                        })
-                                      }))
-                            }
-                            
-                            if didSuccessSaveWord == false {
-                                saveButton
-                            }
+
+    // MARK: - Search Input Card
+    private var searchInputCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("검색어")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.primary)
+                Spacer()
+                Text("\(viewModel.wordCount)/\(viewModel.maxWordCount)")
+                    .font(.caption)
+                    .foregroundStyle(Color.secondary)
+            }
+
+            TextField("검색할 단어를 입력하세요", text: $viewModel.searchWord)
+                .padding(14)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .focused($field, equals: .word)
+                .onChange(of: viewModel.searchWord) { oldValue, newValue in
+                    updateWordCount(oldValue: oldValue, newValue: newValue)
+                    searchButtonEnable = !(viewModel.searchWord.isEmpty || viewModel.searchWord.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+                .onSubmit {
+                    Task {
+                        do {
+                            field = nil
+                            try await searchAI()
+                        } catch {
+                            aiSearchErrorMessage = error.localizedDescription
                         }
                     }
-                    .padding()
                 }
-                .scrollBounceBehavior(.basedOnSize)
-//                .frame( height: geometry.size.height * (orientation.isLandscape ? 0.3 : 0.3))
-            }
+                .background(offsetReader(for: \.inputField))
         }
     }
-    
-    private func examplesTranslateScrollView() -> some View {
-        return Group {
-            GeometryReader { geometry in
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
-                        
-                        if let aiResponse = viewModel.aiResponse {
-                            VStack(alignment: .leading) {
-                                Text("단어 설명:")
-                                    .font(.headline)
-                                Text(aiResponse.explanation)
-                                    .font(.body)
-                                    .contextMenu(ContextMenu(menuItems: {
-                                        Button("Copy", action: {
-                                          UIPasteboard.general.string = aiResponse.explanation
-                                        })
-                                      }))
-                            }
-                            VStack(alignment: .leading) {
-                                Text("예시:")
-                                    .font(.headline)
-                                Text(aiResponse.sentence)
-                                    .font(.body)
-                                    .contextMenu(ContextMenu(menuItems: {
-                                        Button("Copy", action: {
-                                          UIPasteboard.general.string = aiResponse.sentence
-                                        })
-                                      }))
-                            }
-                            VStack(alignment: .leading) {
-                                Text("해석:")
-                                    .font(.headline)
-                                Text(aiResponse.sentenceTranslation)
-                                    .font(.body)
-                                    .contextMenu(ContextMenu(menuItems: {
-                                        Button("Copy", action: {
-                                          UIPasteboard.general.string = aiResponse.sentenceTranslation
-                                        })
-                                      }))
-                            }
-                            VStack(alignment: .leading) {
-                                Text("단어:")
-                                    .font(.headline)
-                                Text(aiResponse.meaning)
-                                    .font(.body)
-                                    .contextMenu(ContextMenu(menuItems: {
-                                        Button("Copy", action: {
-                                          UIPasteboard.general.string = aiResponse.meaning
-                                        })
-                                      }))
-                            }
-                            
-                            if didSuccessSaveWord == false {
-                                saveButton
+
+    // MARK: - Loading View
+    private var loadingView: some View {
+        VStack(spacing: 16) {
+            ForEach(0..<3, id: \.self) { _ in
+                VStack(alignment: .leading, spacing: 8) {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color(.tertiarySystemFill))
+                        .frame(width: 60, height: 14)
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color(.tertiarySystemFill))
+                        .frame(height: 16)
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color(.tertiarySystemFill))
+                        .frame(width: 200, height: 16)
+                }
+                .padding(16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color(.secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+        }
+        .redacted(reason: .placeholder)
+        .shimmering()
+    }
+
+    // MARK: - AI Response Card
+    private var aiResponseCard: some View {
+        VStack(spacing: 12) {
+            if let aiResponse = viewModel.aiResponse {
+                // 뜻/단어
+                ResponseSection(
+                    title: aiResponse.searchType == .meaning ? String(localized: "뜻") : String(localized: "단어"),
+                    content: aiResponse.meaning,
+                    icon: "textformat"
+                )
+
+                // 부연설명
+                ResponseSection(
+                    title: aiResponse.searchType == .meaning ? String(localized: "부연설명") : String(localized: "단어 설명"),
+                    content: aiResponse.explanation,
+                    icon: "doc.text"
+                )
+
+                // 예시
+                ResponseSection(
+                    title: String(localized: "예시"),
+                    content: aiResponse.sentence,
+                    icon: "text.quote"
+                )
+
+                // 해석
+                ResponseSection(
+                    title: String(localized: "해석"),
+                    content: aiResponse.sentenceTranslation,
+                    icon: "arrow.left.arrow.right"
+                )
+
+                // 저장 버튼
+                if !didSuccessSaveWord {
+                    Button {
+                        Task {
+                            do {
+                                try await viewModel.saveToWord()
+                                didSuccessSaveWord = true
+                            } catch {
+                                wordSaveErrorMessage = error.localizedDescription
+                                wordSaveAlert = true
+                                didSuccessSaveWord = false
                             }
                         }
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "plus.circle.fill")
+                            Text("단어장에 저장")
+                        }
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(Color.systemWhite)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 44)
+                        .background(Color.systemBlack)
+                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                     }
-                    .padding()
+                    .alert(LocalizedStringKey(wordSaveErrorMessage), isPresented: $wordSaveAlert) {
+                        Button("확인", role: .cancel) {}
+                    }
+                } else {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                        Text("저장되었습니다")
+                    }
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(Color.secondary)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 44)
                 }
-                .scrollBounceBehavior(.basedOnSize)
-//                .frame( height: geometry.size.height * (orientation.isLandscape ? 0.3 : 0.3))
             }
         }
     }
-    
-    private func placeholderText(geometry: GeometryProxy) -> some View {
-        let width = geometry.size.width
-        let placeholderString: String
-        
-        if width < 375 {
-            placeholderString = "짧은 예시 문장입니다.긴 예시 문장입니다. 가장 큰 화면에서 표시되며, 더 많은 내용과 설명을 포함할 수 있습니다.중간 길이의 예시 문장입니다. 더 많은 내용을 포함합니다.긴 예시 문장입니다. 가장 큰 화면에서 표시되며, 더 많은 내용과 설명을 포함할 수 있습니다.중간 길이의 예시 문장입니다. 더 많은 내용을 포함합니다.긴 예시 문장입니다. 가장 큰 화면에서 표시되며, 더 많은 내용과 설명을 포함할 수 있습니"
-        } else if width < 414 {
-            placeholderString = "중간 길이의 예시 문장입니다. 더 많은 내용을 포함합니다.긴 예시 문장입니다. 가장 큰 화면에서 표시되며, 더 많은 내용과 설명을 포함할 수 있습니다.중간 길이의 예시 문장입니다. 더 많은 내용을 포함합니다.긴 예시 문장입니다. 가장 큰 화면에서 표시되며, 더 많은 내용과 설명을 포함할 수 있습니다"
-        } else if width < 700 {
-            placeholderString = "긴 예시 문장입니다. 가장 큰 화면에서 표시되며, 더 많은 내용과 설명을 포함할 수 있습니다.긴 예시 문장입니다. 가장 큰 화면에서 표시되며, 더 많은 내용과 설명을 포함할 수 있습니다.긴 예시 문장입니다. 가장 큰 화면에서 표시되며, 더 많은 내용과 설명을 포함할 수 있습니다.긴 예시 문장입니다. 가장 큰 화면에서 표시되며, 더 많은 내용과 설명을 포함할 수 있습니다."
-        } else {
-            placeholderString = "긴 예시 문장입니다. 가장 큰 화면에서 표시되며, 더 많은 내용과 설명을 포함할 수 있습니다.긴 예시 문장입니다. 가장 큰 화면에서 표시되며, 더 많은 내용과 설명을 포함할 수 있습니다.긴 예시 문장입니다. 가장 큰 화면에서 표시되며, 더 많은 내용과 설명을 포함할 수 있습니다.긴 예시 문장입니다. 가장 큰 화면에서 표시되며, 더 많은 내용과 설명을 포함할 수 있습니다.긴 예시 문장입니다. 가장 큰 화면에서 표시되며, 더 많은 내용과 설명을 포함할 수 있습니다.긴 예시 문장입니다. 가장 큰 화면에서 표시되며, 더 많은 내용과 설명을 포함할 수 있습니다.긴 예시 문장입니다. 가장 큰 화면에서 표시되며, 더 많은 내용과 설명을 포함할 수 있습니다.긴 예시 문장입니다. 가장 큰 화면에서 표시되며, 더 많은 내용과 "
-        }
-        
-        return Text(placeholderString)
-            .font(.title3)
-            .redacted(reason: .placeholder)
-    }
-    
-    private var cardBackground: some View {
-        Color.systemWhite
-            .cornerRadius(20)
-            .northWestShadow(radius: 5, offset: 5)
-    }
-    
-    private var saveButton: some View {
-        Button {
-            Task {
-                do {
-                    try await viewModel.saveToWord()
-                    didSuccessSaveWord = true
-                } catch {
-                    wordSaveErrorMessage = error.localizedDescription
-                    wordSaveAlert = true
-                    didSuccessSaveWord = false
-                }
-                
+
+    // MARK: - Error Card
+    private var errorCard: some View {
+        VStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(Color.red.opacity(0.1))
+                    .frame(width: 50, height: 50)
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.title3)
+                    .foregroundStyle(Color.red)
             }
-            
-        } label: {
-            Text("단어 저장하기")
+
+            Text(LocalizedStringKey(aiSearchErrorMessage))
+                .font(.subheadline)
+                .foregroundStyle(Color.secondary)
+                .multilineTextAlignment(.center)
         }
-        .frame(height: 30)
-        .buttonStyle(WMButtonStyle())
-        .alert(LocalizedStringKey(wordSaveErrorMessage), isPresented: $wordSaveAlert,
-               presenting: wordSaveErrorMessage) { errorMessage in
-            
-        } message: { errorMessage in
-            //            Text("\(errorMessage)")
-        }
-        .focusable(interactions: .activate)
-        .padding()
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 24)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
-    
+
+    // MARK: - Search Button
     private var searchButton: some View {
         Button {
-            print("검색")
             Task {
                 do {
                     field = nil
                     try await searchAI()
                 } catch {
                     aiSearchErrorMessage = error.localizedDescription
-                    print("?????????????")
                 }
             }
-            
-            
         } label: {
-            Text("AI검색")
+            HStack(spacing: 8) {
+                Image(systemName: "sparkles")
+                Text("AI 검색")
+            }
+            .font(.headline)
+            .foregroundStyle(Color.systemWhite)
+            .frame(maxWidth: .infinity)
+            .frame(height: 50)
+            .background(searchButtonEnable ? Color.systemBlack : Color.gray)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         .disabled(!searchButtonEnable)
-        .frame(height: 50)
-        .buttonStyle(WMButtonStyle(isDisabled: !searchButtonEnable))
-        .focusable(interactions: .activate)
-        .padding(.bottom, orientation.isLandscape ? 0 : 10)
         .background(offsetReader(for: \.searchButton))
     }
-    
-    
-    
+
+    // MARK: - Helper Methods
     private func searchAI() async throws {
         didSuccessSaveWord = false
+        aiSearchErrorMessage = ""
         try await viewModel.search()
     }
-    
+
     private func updateWordCount(oldValue: String, newValue: String) {
         if newValue.count > viewModel.maxWordCount {
             viewModel.searchWord = oldValue
@@ -459,18 +394,48 @@ public struct SearchView: View {
     }
 }
 
+// MARK: - Response Section
+private struct ResponseSection: View {
+    let title: String
+    let content: String
+    let icon: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label {
+                Text(title)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.secondary)
+            } icon: {
+                Image(systemName: icon)
+                    .font(.caption)
+                    .foregroundStyle(Color.secondary)
+            }
+
+            Text(content)
+                .font(.body)
+                .foregroundStyle(Color.primary)
+                .textSelection(.enabled)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+// MARK: - Supporting Types
 extension SearchView {
     enum Field: Hashable {
         case word
-        
+
         var nextField: Field? {
             switch self {
             case .word: return nil
             }
         }
     }
-    
-    // MARK: - Onboarding
+
     private func tooltipOverlay(geometry: GeometryProxy) -> some View {
         Group {
             Color.black.opacity(0.3)
@@ -486,7 +451,7 @@ extension SearchView {
             .position(x: geometry.size.width / 2, y: tooltipYPosition)
         }
     }
-    // MARK: - Helper Methods
+
     private func offsetReader(for keyPath: WritableKeyPath<OffsetValues, CGFloat>) -> some View {
         GeometryReader { geo -> Color in
             DispatchQueue.main.async {
@@ -498,7 +463,7 @@ extension SearchView {
             return Color.clear
         }
     }
-    
+
     private func updateHintType() {
         onboardingHintType = onboardingHintType?.nextHintType
         if onboardingHintType == nil {
@@ -506,8 +471,7 @@ extension SearchView {
             field = .word
         }
     }
-    
-    // MARK: - Computed Properties
+
     private var tooltipText: String {
         switch onboardingHintType {
         case .explanationLanguage: return "1. 검색결과에서 설명하는 언어를 설정합니다."
@@ -517,7 +481,7 @@ extension SearchView {
         case .none: return ""
         }
     }
-    
+
     private var tooltipYPosition: CGFloat {
         switch onboardingHintType {
         case .explanationLanguage: return offsets.explanationLanguage
@@ -527,30 +491,63 @@ extension SearchView {
         case .none: return 0
         }
     }
-    
+
     struct OffsetValues {
         var explanationLanguage: CGFloat = 0
         var searchLanguage: CGFloat = 0
         var inputField: CGFloat = 0
         var searchButton: CGFloat = 0
     }
-    
+
     enum OnboardingHintType: Int {
         case explanationLanguage
         case searchLanguage
         case inputField
         case searchButton
-        
+
         var nextHintType: OnboardingHintType? {
             return OnboardingHintType(rawValue: self.rawValue + 1)
         }
     }
 }
 
-
-struct SearchView_Preview: PreviewProvider {
-    
-    static var previews: some View {
-        SearchView(diContainer: SearchMockDIContainer())
+// MARK: - Shimmer Effect
+private extension View {
+    @ViewBuilder
+    func shimmering() -> some View {
+        self.modifier(ShimmerModifier())
     }
+}
+
+private struct ShimmerModifier: ViewModifier {
+    @State private var phase: CGFloat = 0
+
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                GeometryReader { geometry in
+                    LinearGradient(
+                        colors: [
+                            Color.clear,
+                            Color.white.opacity(0.4),
+                            Color.clear
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                    .frame(width: geometry.size.width * 2)
+                    .offset(x: -geometry.size.width + (geometry.size.width * 2 * phase))
+                }
+                .mask(content)
+            }
+            .onAppear {
+                withAnimation(.linear(duration: 1.2).repeatForever(autoreverses: false)) {
+                    phase = 1
+                }
+            }
+    }
+}
+
+#Preview {
+    SearchView(diContainer: SearchMockDIContainer())
 }

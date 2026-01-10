@@ -61,7 +61,7 @@ struct ReviewCardView: View {
                         .padding(.bottom, 16)
                 }
                 .coordinateSpace(name: "VStack")
-                .allowsHitTesting(showOnboaringWithFetched == false)
+//                .allowsHitTesting(showOnboaringWithFetched == false)
 
                 // 제거 안해도충분할듯, 그것보다 우측에 삐져나가는게 싫음.
 //                if showOnboaringWithFetched {
@@ -263,7 +263,7 @@ struct ReviewCardView: View {
                     Text("다시 시도")
                 }
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(.white)
+                .foregroundStyle(Color.systemWhite)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 10)
                 .background(Color.systemBlack)
@@ -440,7 +440,7 @@ private struct AIExampleCard: View {
                         if isSpeaking {
                             Image(systemName: "waveform")
                                 .font(.caption.weight(.bold))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(Color.systemWhite)
                         } else {
                             Text("\(index)")
                                 .font(.caption.weight(.bold))
@@ -586,7 +586,7 @@ private struct UserActionButton: View {
                     Text("맞음")
                         .font(.caption.weight(.medium))
                 }
-                .foregroundStyle(.white)
+                .foregroundStyle(Color.systemWhite)
                 .frame(maxWidth: .infinity)
                 .frame(height: 50)
                 .background(
@@ -635,7 +635,7 @@ private struct ShimmerModifier: ViewModifier {
                     LinearGradient(
                         colors: [
                             Color.clear,
-                            Color.white.opacity(0.4),
+                            Color.systemBlack.opacity(0.4),
                             Color.clear
                         ],
                         startPoint: .leading,

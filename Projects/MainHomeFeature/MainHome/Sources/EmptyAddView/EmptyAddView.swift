@@ -26,9 +26,9 @@ public struct EmptyAddView: View {
             Button {
                 showAddSheet.toggle()
             } label: {
-                Label("단어 추가", systemImage: "plus")
+                Label(String(localized: "단어 추가"), systemImage: "plus")
                     .font(.body.weight(.medium))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.systemWhite)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
                     .background(Color.accentColor)
