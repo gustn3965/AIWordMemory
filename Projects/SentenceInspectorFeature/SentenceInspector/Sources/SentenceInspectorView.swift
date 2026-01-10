@@ -325,6 +325,11 @@ extension SentenceInspectorView {
         Group {
             Color.black.opacity(0.3)
                 .ignoresSafeArea()
+                .onTapGesture {
+                    withAnimation {
+                        updateHintType()
+                    }
+                }
             WMTooltipView(text: tooltipText, location: .centerBottom) {
                 updateHintType()
             }

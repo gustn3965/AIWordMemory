@@ -9,44 +9,44 @@ import SwiftUI
 import CommonUI
 
 public struct EmptyAddView: View {
-    
+
     @Binding var showAddSheet: Bool
     var namespace: Namespace.ID
-    
-    public var body: some View {
-        
-        ZStack {
-            BackgroundView()
-            
-            VStack(alignment: .center) {
-                Text("외우고자 하는 단어를 추가해주세요.")
-                    .font(.headline)
-                    .padding(EdgeInsets.init(top: 10, leading:0, bottom: 0, trailing: 0))
                 
-                Button {
-                    showAddSheet.toggle()
-                } label: {
-                    ZStack {
-                        Color.element
-                            .cornerRadius(10)
-                            .northWestShadow(radius:1, offset: 2)
-                        Image(systemName: "plus")
-                            
-                        .padding(EdgeInsets.init(top: 20, leading: 30, bottom: 20, trailing: 30))
-                    }
-                }
-                .frame(width: 100, height: 100)
-                .versioned { view in
-                    if #available(iOS 26.0, *) {
-                        view.matchedTransitionSource(id: "add_write_from_empty", in: namespace)
-                    }
-                }
-//                .scrollDisabled(true)
+    public var body: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "text.book.closed")
+                .font(.system(size: 48))
+                .foregroundStyle(Color.secondary)
+
+            Text("외우고자 하는 단어를 추가해주세요.")
+                .font(.headline)
+                .foregroundStyle(Color.primary)
+
+            Button {
+                showAddSheet.toggle()
+            } label: {
+                Label("단어 추가", systemImage: "plus")
+                    .font(.body.weight(.medium))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 12)
+                    .background(Color.accentColor)
+                    .clipShape(Capsule())
             }
-            .padding(.bottom, 10)
+            .versioned { view in
+                if #available(iOS 26.0, *) {
+                    view.matchedTransitionSource(id: "add_write_from_empty", in: namespace)
+                } else {
+                    view
+                }
+            }
         }
-        .padding(EdgeInsets(top: 20, leading: 0, bottom: 20, trailing: 0))
-        
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 40)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .padding(.horizontal, 16)
     }
 }
 

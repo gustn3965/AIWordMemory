@@ -8,128 +8,147 @@
 import SwiftUI
 import CommonUI
 
-
-
 public struct FilterTagView: View {
     @ObservedObject var viewModel: FilterTagViewModel
-    
+
     init(viewModel: FilterTagViewModel) {
         self.viewModel = viewModel
     }
-    
-    @State var expandTagView: Bool = false
-    let gridItems: [GridItem] = [GridItem(.flexible(minimum: 10, maximum: 10))]
-    
-    let vGridItems: [GridItem] = [ GridItem(.adaptive(minimum: 100, maximum: 2000), spacing: 10)]
+
+    @State private var isExpanded: Bool = false
+
     public var body: some View {
-        
-//        VStack {
-            ZStack {
-                BackgroundView()
-                
-                VStack(alignment: .leading, spacing: 10) {
-                    
-                    HStack {
-                        Image("gridicons_tag-light", bundle: CommonUIResources.bundle)
-                            .padding(EdgeInsets.init(top: 5, leading:20, bottom: 5, trailing: 0))
-                        if viewModel.isAllSelected() {
-                            Text("모든 태그 & 태그없음")
-                                .font(.callout)
-                                .padding(.leading, 10)
-                            Spacer()
-                        } else {
-                            ScrollView(.horizontal) {
-                                LazyHGrid(rows: gridItems, spacing: 10) {
-                                    ForEach(viewModel.selectedItems) { item in
-                                        WMChipButton(title: item.title,
-                                                     isSelected: true,
-                                                     isEnabled: false) {
-                                            viewModel.setSelectedItem(item: item)
-                                        }
-                                    }
-                                }
-                                .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
-                            }
-                            .fixedSize(horizontal: false, vertical: true)
-                        }
-                        
-                        
-                        Button {
-                            expandTagView.toggle()
-                        } label: {
-                            Image(systemName: "ellipsis.circle.fill")
-                        }
-                        .buttonStyle(PlainButtonStyle())
+        VStack(alignment: .leading, spacing: 0) {
+            // 헤더
+            Button {
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    isExpanded.toggle()
+                }
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "tag.fill")
+                        .font(.body)
                         .foregroundStyle(Color.systemBlack)
-                        .padding(.trailing, 10)
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        expandTagView.toggle()
-                    }
-                    
-                    if expandTagView {
-//                        ScrollView {
-                        VStack {
-                            LazyVGrid(columns: vGridItems, alignment: .leading, spacing: 10) {
-                                ForEach(viewModel.items) { item in
-                                    WMChipButton(title: item.title,
-                                                 isSelected: viewModel.isSelecteditem(item: item)) {
-                                        viewModel.setSelectedItem(item: item)
-                                    }
-                                                 .frame(height: 40)
-                                    
+
+                    // 선택된 태그들 표시
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 6) {
+                            if viewModel.isAllSelected() {
+                                Text("모든 태그")
+                                    .font(.body)
+                                    .foregroundStyle(Color.secondary)
+                            } else {
+                                ForEach(viewModel.selectedItems) { item in
+                                    SelectedTagBadge(title: item.title)
                                 }
                             }
-                            .padding(EdgeInsets(top: 0, leading: 3, bottom: 0, trailing: 10))
-                            //                        }
-                            .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
-                            
-                            HStack {
-                                Button {
-                                    print("확인")
-                                    viewModel.selectAllItem()
-//                                    viewModel.showAlertNewAddTag.toggle()
-                                } label: {
-                                    Text("모든 태그")
-                                }
-                                .buttonStyle(WMButtonStyle(backgroundColor: Color.shadow))
-                                .frame(height: 40)
-                            }
-                            .padding()
                         }
                     }
-                    
+
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(Color(.tertiaryLabel))
                 }
-//                .animation(.easeIn, value: expandTagView)
-                .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 0))
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             }
-            .padding(EdgeInsets(top: 20, leading: 0, bottom: 20, trailing: 0))
-            .task {
-                do {
-                    try await viewModel.fetch()
-                } catch {
-                
+            .buttonStyle(.plain)
+
+            // 펼쳐진 태그 목록
+            if isExpanded {
+                VStack(alignment: .leading, spacing: 12) {
+                    // 태그 목록 (수평 스크롤)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(viewModel.items) { item in
+                                TagChip(
+                                    title: item.title,
+                                    isSelected: viewModel.isSelecteditem(item: item)
+                                ) {
+                                    viewModel.setSelectedItem(item: item)
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                    }
+
+                    // 모든 태그 선택 버튼
+                    Button {
+                        viewModel.selectAllItem()
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "checkmark.circle.fill")
+                            Text("모든 태그 선택")
+                                .font(.subheadline)
+                        }
+                        .foregroundStyle(Color.systemBlack)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 4)
                 }
+                .padding(.vertical, 12)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .padding(.top, 8)
+                .transition(.opacity.combined(with: .move(edge: .top)))
             }
-//        }
+        }
+        .task {
+            do {
+                try await viewModel.fetch()
+            } catch {
+            }
+        }
     }
-    
-    mutating func toggleSelectButton(_ item: FilterTagItem) {
-        //        item.selected = true
+}
+
+// 선택된 태그 뱃지 (헤더용)
+private struct SelectedTagBadge: View {
+    let title: String
+
+    var body: some View {
+        Text(title)
+            .font(.subheadline)
+            .foregroundStyle(Color.systemBlack)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(Color.systemBlack.opacity(0.15))
+            .clipShape(Capsule())
+    }
+}
+
+// 태그 칩 (선택용)
+private struct TagChip: View {
+    let title: String
+    let isSelected: Bool
+    var action: (() -> Void)? = nil
+
+    var body: some View {
+        Button {
+            action?()
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.subheadline)
+                Text(title)
+                    .font(.subheadline)
+            }
+            .foregroundStyle(isSelected ? .white : Color.primary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(isSelected ? Color.systemBlack : Color(.tertiarySystemFill))
+            .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
     }
 }
 
 #Preview {
-    List {
-        Text("hihi")
-            .listRowSeparator(.hidden)
+    VStack {
         FilterTagView(viewModel: FilterTagViewModel(dbService: ReviewMockDIContainer().makeDBImplementation()))
-            .listRowSeparator(.hidden)
-        //            .frame(width: 300, height: 140)
-        
+            .padding()
+        Spacer()
     }
-    .listStyle(.plain)
-    
-    
 }

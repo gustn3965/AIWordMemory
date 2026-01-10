@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AppCoordinatorService
+import CommonUI
 
 public protocol SettingsUsecase {}
 struct SettingsMockUsecase: SettingsUsecase {}
@@ -49,44 +50,66 @@ public struct SettingsContentView: View {
     
     public var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVStack {
-                    ForEach(viewModel.menuList, id: \.self) { (menuList: [SettingMenuList]) in
-                        SectionView(menuList: menuList, onItemTap: { menuItem in
-                            selectedMenu = menuItem
-                        })
-                        .listRowSeparator(.hidden)
+            List {
+                ForEach(viewModel.menuList, id: \.self) { (menuList: [SettingMenuList]) in
+                    Section {
+                        ForEach(menuList) { item in
+                            Button {
+                                selectedMenu = item
+                            } label: {
+                                SettingsRow(item: item)
+                            }
+                        }
                     }
                 }
-                .listStyle(.plain)
-                .navigationTitle("설정")
-                .navigationDestination(item: $selectedMenu, destination: { menu in
-                    
-                    
-                    switch menu {
-                    
-                    case .notice:
-                        NoticeView(menu: menu)
-                    case .feedback:
-                        FeedbackView(menu: menu)
-                    case .appInfo:
-                        AppInfoView(diContainer: diContainer, menu: menu, appCoordinator: appCoordinator)
-                    case .account:
-                        AccountView(diContainer: diContainer, menu: menu, appCoordinator: appCoordinator)
-                    case .tag:
-                        TagListView(diContainer: diContainer, menu: menu)
-                        
-                    case .cbtResetGPTChances:
-                        TESTResetGPTChancesView(diContainer: diContainer, menu: menu)
-                    case .cbtChagneSpeechImplementation:
-                        TESTSpeechChangeView(diContainer: diContainer, menu: menu)
-                    case .cbtResetAppStorage:
-                        TESTAppStorageView(diContainer: diContainer, menu: menu)
-                    }
-                })
             }
-            .scrollBounceBehavior(.basedOnSize)
+            .listStyle(.insetGrouped)
+            .navigationTitle("설정")
+            .navigationDestination(item: $selectedMenu, destination: { menu in
+                switch menu {
+                case .notice:
+                    NoticeView(menu: menu)
+                case .feedback:
+                    FeedbackView(menu: menu)
+                case .appInfo:
+                    AppInfoView(diContainer: diContainer, menu: menu, appCoordinator: appCoordinator)
+                case .account:
+                    AccountView(diContainer: diContainer, menu: menu, appCoordinator: appCoordinator)
+                case .tag:
+                    TagListView(diContainer: diContainer, menu: menu)
+                case .cbtResetGPTChances:
+                    TESTResetGPTChancesView(diContainer: diContainer, menu: menu)
+                case .cbtChagneSpeechImplementation:
+                    TESTSpeechChangeView(diContainer: diContainer, menu: menu)
+                case .cbtResetAppStorage:
+                    TESTAppStorageView(diContainer: diContainer, menu: menu)
+                }
+            })
         }
+    }
+}
+
+private struct SettingsRow: View {
+    let item: SettingMenuList
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(item.iconName, bundle: CommonUIResources.bundle)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 24, height: 24)
+                .foregroundStyle(Color.accentColor)
+
+            Text(LocalizedStringKey(item.name))
+                .foregroundStyle(Color.primary)
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(Color(.tertiaryLabel))
+        }
+        .contentShape(Rectangle())
     }
 }
 

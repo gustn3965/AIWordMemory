@@ -57,17 +57,20 @@ public struct MainHomeView: View {
             WriteView(diContainer: diContainer)
                 .versioned { view in
                     if #available(iOS 26.0, *) {
-                        
                         view.navigationTransition(.zoom(sourceID: "add_write", in: namespace))
-                        
+                    } else {
+                        view
                     }
                 }
+                
         }
         .sheet(isPresented: $viewModel.showAddViewSheet) {
             WriteView(diContainer: diContainer)
                 .versioned { view in
                     if #available(iOS 26.0, *) {
                         view.navigationTransition(.zoom(sourceID: "add_write_from_empty", in: namespace))
+                    } else {
+                        view
                     }
                 }
         }
@@ -76,6 +79,8 @@ public struct MainHomeView: View {
                 .versioned { view in
                     if #available(iOS 26.0, *) {
                         view.navigationTransition(.zoom(sourceID: "add_write_from_app", in: namespace))
+                    } else {
+                        view
                     }
                 }
         }
@@ -85,64 +90,60 @@ public struct MainHomeView: View {
     
     // MARK: - Subviews
     private func mainList(geometry: GeometryProxy) -> some View {
-        List {
+        Group {
             if viewModel.needEmptyAddView {
-                EmptyAddView(showAddSheet: $viewModel.showAddViewSheet, namespace: namespace)
-                    .listRowSeparator(.hidden)
-            } else {
-                if viewModel.needTopExpandableTagView {
-                    SearchExpandableTagview(viewModel: viewModel.tagViewModel)
+                List {
+                    EmptyAddView(showAddSheet: $viewModel.showAddViewSheet, namespace: namespace)
                         .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
                 }
-                
-                WordCardView2(viewModel: viewModel.wordCardviewModel)
-                    .listRowSeparator(.hidden)
-                    .frame(height: geometry.size.height * 0.7)
+                .listStyle(.plain)
+            } else {
+                WordCardView2(
+                    viewModel: viewModel.wordCardviewModel,
+                    tagViewModel: viewModel.needTopExpandableTagView ? viewModel.tagViewModel : nil
+                )
             }
         }
     }
     
     private var addButton: some View {
-        ZStack {
-            Capsule()
-                .inset(by: 3)
-                .fill(Color.element)
-                .southEastShadow(radius: 1, offset: 2)
-            
-            Button(action: { viewModel.addWordSheet.toggle() }) {
-                VStack {
-                    Text("+")
-                        .font(.title)
-//                    if UIDevice.current.userInterfaceIdiom == .pad {
-//                        Text("(enter)")
-//                            .font(.caption)
-//                    }
+        Button(action: { viewModel.addWordSheet.toggle() }) {
+            Image(systemName: "plus")
+                .versioned { view in
+                    if #available(iOS 26.0, *) {
+                        view
+                            .foregroundStyle(Color.white)
+                        .frame(width: 56, height: 56)
+                    } else {
+                        view.font(.title2.weight(.semibold))
+                            .foregroundStyle(Color.accentColor)
+                            .frame(width: 56, height: 56)
+                            .background(Color.systemWhite)
+                            .clipShape(Circle())
+                                        .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
+                    }
                 }
-            }
-            .buttonStyle(WMButtonStyle())
-            .frame(width: UIDevice.current.userInterfaceIdiom == .pad ? 80 : 60, height: UIDevice.current.userInterfaceIdiom == .pad ? 80 : 60)
-            .focusable(interactions: .activate)
-            .versioned { view in
-                if #available(iOS 26.0, *) {
-                    view.matchedTransitionSource(id: "add_write", in: namespace)
-                }
-            }
-            
-//            .focused($addWriteButtonFocus)
-////            .focusEffectDisabled()
-//            .onKeyPress(.tab) {
-//                debugPrint("key: tab!!!!!!!!")
-//                Task {
-//                    await MainActor.run {
-//                        viewModel.addWordSheet.toggle() // Button의 action을 실행합니다
-//                    }
-//                }
-//                return .handled // 이벤트를 처리했음을 나타냅니다
-//            }
+
         }
-        .frame(width: 65, height: 65)
+        .versioned { view in
+            if #available(iOS 26.0, *) {
+                view
+                    .glassEffect(.regular.tint(Color.systemBlack))
+            } else {
+                view
+            }
+        }
+        .focusable(interactions: .activate)
         .padding(.trailing, 20)
         .padding(.bottom, 20)
+        .versioned { view in
+            if #available(iOS 26.0, *) {
+                view.matchedTransitionSource(id: "add_write", in: namespace)
+            } else {
+                view
+            }
+        }
     }
     
     // MARK: - Helper Methods

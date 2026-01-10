@@ -9,12 +9,11 @@ import SwiftUI
 import CommonUI
 import AppCoordinatorService
 struct DetailView: View {
-    
     @ObservedObject var appCoordinator: AppCoordinator
     @StateObject var viewModel: DetailViewModel
-    
     @Environment(\.dismiss) var dismiss
-    let gridItems: [GridItem] = [GridItem(.flexible(minimum: 10, maximum: 10))]
+    
+    @State var isClicked: Bool = false
     var diContainer: MainHomeDependencyInjection
     init(diContainer: MainHomeDependencyInjection, wordIdentity: String, appCoordinator: AppCoordinator) {
         self.diContainer = diContainer
@@ -23,145 +22,26 @@ struct DetailView: View {
     }
     
     var body: some View {
-        
-        GeometryReader { geometry in
-            
-            ZStack {
-                BackgroundView()
-                
-                VStack {
-                    VStack {
-                        ScrollView {
-                            Text("\(viewModel.correctCount)번 맞춤")
-                                .font(.callout)
-                                .padding(.bottom, 10)
-                            
-                            Spacer()
-                            Text(viewModel.word)
-                                .font(.title)
-                                .padding(.bottom, 10)
-                                .onTapGesture {
-                                    print("-----------")
-                                    Task {
-                                        try? await viewModel.speechAppleTTS(content: viewModel.word)
-                                    }
-                                }
-                            
-                            Text(viewModel.meaning)
-                                .font(.title3)
-                                .padding(.bottom, 10)
-                            
-                            HStack {
-                                if viewModel.tags.isEmpty == false {
-                                    Image("gridicons_tag-light", bundle: CommonUIResources.bundle)
-                                        .padding(EdgeInsets.init(top: 0, leading:0, bottom: 5, trailing: 0))
-                                    ScrollView(.horizontal) {
-                                        LazyHGrid(rows: gridItems, spacing: 10) {
-                                            ForEach(viewModel.tags.indices, id: \.self) { (index: Int) in
-                                                WMChipButton(title: viewModel.tags[index],
-                                                             isSelected: true,
-                                                             isEnabled: false) {
-                                                    
-                                                }
-                                            }
-                                        }
-                                        .padding(EdgeInsets(top: 5, leading: 5, bottom: 15, trailing: 5))
-                                    }
-                                    .frame(maxWidth: geometry.size.width * 0.75)
-                                    .fixedSize(horizontal: true, vertical: true)
-                                }
-                            }
-                            
-                            
-                            if viewModel.sentences.isEmpty {
-                                
-                                Text("생성된 문장이 없습니다.")
-                                    .font(.body)
-                                    .padding(.top, 30)
-                                Text("리뷰를 하시면 AI가 생성해줘요.")
-                                    .font(.body)
-                                Button {
-                                    appCoordinator.showReviewTab = true
-                                } label: {
-                                    Label {
-                                        Text("리뷰하러 가기")
-                                    } icon: {
-                                        Image("material-symbols_rate-review-rounded", bundle: CommonUIResources.bundle)
-                                            .resizable()
-                                            .frame(width: 20, height: 20)
-                                    }
-                                }
-                                .buttonStyle(WMButtonStyle())
-                                .fixedSize()
-                                .frame(height: 30)
-                                .padding(.top, 10)
-                                
-                            } else {
-                                
-                                HStack {
-                                    Image("ph_open-ai-logo-light", bundle: CommonUIResources.bundle)
-                                        .resizable()
-                                        .frame(width: 25, height: 25)
-                                    Text("AI 문장 학습")
-                                        .font(.headline)
-                                    Spacer()
-                                }
-                                .padding(.top, 10)
-                                .padding([.leading, .trailing], 7)
-                                //                            .frame(width: geometry.size.width * 0.85)
-                                
-                                ScrollView {
-                                    ForEach(viewModel.sentences) { (sentence: DetailViewModel.Sentence) in
-                                        HStack {
-                                            Text(sentence.example)
-                                                .font(.headline)
-                                            Spacer()
-                                        }
-                                        HStack {
-                                            Text(sentence.translation)
-                                                .font(.body)
-                                            Spacer()
-                                        }
-                                        Divider()
-                                    }
-                                }
-                                .scrollBounceBehavior(.basedOnSize)
-                                .padding([.leading, .trailing], 7)
-                                //                            .frame(width: geometry.size.width * 0.85)
-                            }
-                        }
-                    }
-                    
-                    HStack(spacing: 20) {
-                        Button {
-                            viewModel.deleteAlert.toggle()
-                        } label: {
-                            
-                            Image("material-symbols_delete-rounded", bundle: CommonUIResources.bundle)
-                                .resizable()
-                                .frame(width: 24, height: 24)
-                        }
-                        .buttonStyle(WMButtonStyle())
-                        
-                        
-                        Button {
-                            viewModel.editSheet.toggle()
-                        } label: {
-                            Image("icon-park-solid_edit-light", bundle: CommonUIResources.bundle)
-                                .resizable()
-                                .frame(width: 22, height: 22)
-                        }
-                        .buttonStyle(WMButtonStyle())
-                        
-                    }
-                    .frame(height: 30)
-                    .padding([.leading, .trailing, .bottom])
+        ScrollView {
+            VStack(spacing: 20) {
+                // 단어 카드
+                wordCard
+
+                // 태그 섹션
+                if !viewModel.tags.isEmpty {
+                    tagsSection
                 }
-                .padding()
+
+                // AI 문장 섹션
+                sentencesSection
             }
-            
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
+            .padding(.bottom, 100)
         }
-        .padding(.all, 30)
+        .safeAreaInset(edge: .bottom) {
+            actionButton()
+        }
         //        .background()
         .alert("삭제하시겠습니까?",
                isPresented: $viewModel.deleteAlert,
@@ -192,12 +72,265 @@ struct DetailView: View {
             do {
                 try await viewModel.fetch()
             } catch {
-                
             }
+        }
+    }
+
+    // MARK: - Subviews
+    private var wordCard: some View {
+        VStack(spacing: 12) {
+            // 맞춘 횟수
+            Text("\(viewModel.correctCount)번 맞춤")
+                .font(.caption)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(Color.systemBlack)
+                .clipShape(Capsule())
+
+            // 단어
+            Button {
+                Task {
+                    try? await viewModel.speechAppleTTS(content: viewModel.word)
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Text(viewModel.word)
+                        .font(.largeTitle.bold())
+                        .foregroundStyle(Color.primary)
+                    Image(systemName: "speaker.wave.2.fill")
+                        .font(.title3)
+                        .foregroundStyle(Color.systemBlack)
+                }
+            }
+
+            // 뜻
+            Text(viewModel.meaning)
+                .font(.title3)
+                .foregroundStyle(Color.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 24)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private var tagsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 6) {
+                Image(systemName: "tag.fill")
+                    .font(.subheadline)
+                    .foregroundStyle(Color.systemBlack)
+                Text("태그")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.primary)
+            }
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(viewModel.tags, id: \.self) { tag in
+                        Text(tag)
+                            .font(.subheadline)
+                            .foregroundStyle(Color.systemBlack)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.systemBlack.opacity(0.1))
+                            .clipShape(Capsule())
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private var sentencesSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if viewModel.sentences.isEmpty {
+                // 빈 상태
+                VStack(spacing: 12) {
+                    Image(systemName: "text.bubble")
+                        .font(.system(size: 40))
+                        .foregroundStyle(Color.secondary)
+
+                    Text("생성된 문장이 없습니다")
+                        .font(.headline)
+                        .foregroundStyle(Color.primary)
+
+                    Text("리뷰를 하시면 AI가 생성해줘요")
+                        .font(.subheadline)
+                        .foregroundStyle(Color.secondary)
+
+                    Button {
+                        appCoordinator.showReviewTab = true
+                    } label: {
+                        Label("리뷰하러 가기", systemImage: "arrow.right.circle.fill")
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .background(Color.systemBlack)
+                            .clipShape(Capsule())
+                    }
+                    .padding(.top, 4)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 24)
+            } else {
+                // 헤더
+                HStack(spacing: 8) {
+                    Image("ph_open-ai-logo-light", bundle: CommonUIResources.bundle)
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                    Text("AI 문장 학습")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.primary)
+                    Spacer()
+                }
+
+                // 문장 목록
+                ForEach(viewModel.sentences) { sentence in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(sentence.example)
+                            .font(.body.weight(.medium))
+                            .foregroundStyle(Color.primary)
+                        Text(sentence.translation)
+                            .font(.subheadline)
+                            .foregroundStyle(Color.secondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(12)
+                    .background(Color(.tertiarySystemFill))
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    @Namespace var namespace
+    @ViewBuilder
+    func actionButton() -> some View {
+        if #available(iOS 26.0, *) {
+            HStack {
+                Spacer()
+                GlassEffectContainer {
+                    HStack(spacing: 12) {
+                        if isClicked {
+                            // 삭제 버튼
+                            Button {
+                                viewModel.deleteAlert.toggle()
+                            } label: {
+                                Image(systemName: "trash")
+                                    .font(.title3)
+                                    .foregroundStyle(.red)
+                                    .frame(width: 50, height: 50)
+//                                    .background(.ultraThinMaterial)
+                                    .clipShape(Circle())
+                            }
+                            .glassEffect()
+                            .glassEffectID("editButton1", in: namespace)
+                            
+                            // 수정 버튼
+                            Button {
+                                viewModel.editSheet.toggle()
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Text("수정")
+                                }
+                                .font(.headline)
+                                .foregroundStyle(Color.systemBlack)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                //                .background(Color.systemBlack)
+                                //                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            }
+//                            .buttonStyle(.glass)
+                            .glassEffect()
+                            .glassEffectID("editButton2", in: namespace)
+                        }
+                        
+                        // 수정 버튼
+                        
+                        Button {
+                            withAnimation {
+                                isClicked.toggle()
+                            }
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: isClicked ? "xmark" : "pencil")
+                            }
+                            .font(.headline)
+                            .foregroundStyle(Color.white)
+                            .frame(width: 50, height: 50)
+                        }
+                        .glassEffect(.regular.tint(Color.systemBlack))
+                        .glassEffectID("editButton", in: namespace)
+                        .glassEffectTransition(.matchedGeometry)
+
+                        
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+//            .background(.ultraThinMaterial)
+        } else {
+            // Fallback on earlier versions
+            HStack(spacing: 12) {
+                // 삭제 버튼
+                Button {
+                    viewModel.deleteAlert.toggle()
+                } label: {
+                    Image(systemName: "trash")
+                        .font(.title3)
+                        .foregroundStyle(.red)
+                        .frame(width: 50, height: 50)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Circle())
+                }
+                .versioned { view in
+                    if #available(iOS 26.0, *) {
+                        view.glassEffect()
+                    } else {
+                        view
+                    }
+                }
+                
+                // 수정 버튼
+                Button {
+                    viewModel.editSheet.toggle()
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "pencil")
+                        Text("수정")
+                    }
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    //                .background(Color.systemBlack)
+                    //                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+                .versioned { view in
+                    if #available(iOS 26.0, *) {
+                        view.glassEffect(.regular.tint(Color.systemBlack))
+                    } else {
+                        view
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+                    
         }
         
     }
-    
 }
 
 #Preview {

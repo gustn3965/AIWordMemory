@@ -6,7 +6,7 @@ import ProjectDescription
 
 public let CURRENT_PROJECT_VERSION_VALUE = "9"
 public let MARKETING_VERSION_VALUE = "1.5.0"
-public let SWIFT_VERSION_VALUE = "6.0"
+public let SWIFT_VERSION_VALUE = "6.2"
 public let deploymentTargetiOS = "17.4"
 
 nonisolated(unsafe) public let CODE_SIGN_ENTITLEMENTS = WMSettingValue(stringLiteral: "")

@@ -10,195 +10,180 @@ import CommonUI
 
 
 public struct WordCardView2: View {
-    
-    init(viewModel: WordCardViewModel) {
+
+    init(viewModel: WordCardViewModel, tagViewModel: ExpandableTagViewModel? = nil) {
         self.viewModel = viewModel
+        self.tagViewModel = tagViewModel
     }
-    @State private var orientation = UIDeviceOrientation.unknown
-    
+
     @ObservedObject var viewModel: WordCardViewModel
-    @State private var currentPage = 0
-    @State private var cardHeight: CGFloat = 0
+    var tagViewModel: ExpandableTagViewModel?
     @State private var viewType: WordCardViewType = .all
-    
-    private let bottomTabPadding = 20.0
+
     public var body: some View {
-        ZStack {
-            BackgroundView()
-            
-            VStack(alignment: .leading) {
-                HStack(spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
+            // 헤더
+            VStack(spacing: 12) {
+                // 상단: 제목 + 개수
+                HStack {
                     Text("단어 목록")
-                        .font(.headline)
-                        .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 0))
-                    
-                    wordFilterPickerView
-                    sortFilterPickerView
-                    
+                        .font(.title2.bold())
+
+                    Spacer()
+
+                    Text("\(viewModel.items.count)개")
+                        .font(.subheadline)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(Color.accentColor)
+                        .clipShape(Capsule())
+                }
+
+                // 하단: 필터 버튼들
+                HStack(spacing: 8) {
+                    FilterButton(
+                        icon: "eye",
+                        title: viewType.rawValue,
+                        menu: {
+                            ForEach(WordCardViewType.allCases) { type in
+                                Button {
+                                    viewType = type
+                                } label: {
+                                    Label(LocalizedStringKey(type.rawValue), systemImage: viewType == type ? "checkmark" : "")
+                                }
+                            }
+                        }
+                    )
+
+                    FilterButton(
+                        icon: "arrow.up.arrow.down",
+                        title: viewModel.sortType.name,
+                        menu: {
+                            ForEach(WordCardSortFilter.allCases) { type in
+                                Button {
+                                    viewModel.sortType = type
+                                } label: {
+                                    Label(LocalizedStringKey(type.name), systemImage: viewModel.sortType == type ? "checkmark" : "")
+                                }
+                            }
+                        }
+                    )
+
                     Spacer()
                 }
-                
-                GeometryReader { geometry in
-                    let isWideView = UIDevice.current.userInterfaceIdiom == .pad || orientation.isLandscape
-                    
-                    let itemsPerPage = max(1, Int((geometry.size.height - bottomTabPadding) / (cardHeight + 20))) * (isWideView ? 2 : 1) // cardHeight + 간격
-                    let _ = print(itemsPerPage)
-                    let maxWidth = isWideView ? geometry.size.width / 2 - 80 : geometry.size.width - 40
-                    let gridItems = isWideView ? [GridItem(.flexible(maximum: maxWidth)), GridItem(.flexible(maximum: maxWidth))] : [GridItem(.flexible(maximum: maxWidth))]
-                    
-                    
-                    TabView(selection: $currentPage) {
-                        ForEach(0..<(viewModel.items.count + itemsPerPage - 1) / itemsPerPage, id: \.self) { pageIndex in
-                            VStack {
-                                LazyVGrid(columns: gridItems, spacing: 20) {
-                                    ForEach(viewModel.items[pageIndex * itemsPerPage..<min((pageIndex + 1) * itemsPerPage, viewModel.items.count)]) { item in
-                                        NavigationLink(value: item) {
-                                            CardView2(cardItem: item, viewType: viewType)
-                                                .reportHeight()
-                                        }
-                                    }
-                                }
-                                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+
+            // 단어 리스트
+            ScrollView {
+                LazyVStack(spacing: 0) {
+                    // 태그 필터
+                    if let tagVM = tagViewModel {
+                        SearchExpandableTagview(viewModel: tagVM)
+                    }
+
+                    // 단어 목록
+                    LazyVStack(spacing: 8) {
+                        ForEach(viewModel.items) { item in
+                            NavigationLink(value: item) {
+                                WordRowView(item: item, viewType: viewType)
                             }
-                            .tag(pageIndex)
-                            
                         }
-                        .padding(.bottom, bottomTabPadding)
                     }
-                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
-                    .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
-                    
                 }
             }
-            .padding(EdgeInsets(top: 15, leading: 0, bottom: 0, trailing: 0))
-            .onPreferenceChange(CardHeightPreferenceKey.self) { height in
-                MainActor.assumeIsolated() {
-                    self.cardHeight = height
-                    print("-----------", height)
-                }
+        }
+        .onChange(of: viewModel.sortType) { _, _ in
+            Task {
+                try? await viewModel.fetchWords(filter: viewModel.filter)
             }
-            .onRotate { newOrientation in
-                        orientation = newOrientation
-                    }
         }
         .runOnceTask {
-            
-            print("# \(#file) \(#function)")
             do {
                 try await viewModel.fetchWords(filter: viewModel.filter)
             } catch {
-                
-            }
-        }
-    }
-    
-    private var wordFilterPickerView: some View {
-        Picker("", selection: $viewType) {
-            ForEach(WordCardViewType.allCases) { (viewType: WordCardViewType) in
-                Text(LocalizedStringKey(viewType.rawValue)).tag(viewType)
-            }
-        }
-        .tint(Color.systemBlack)
-        .pickerStyle(.menu)
-        .fixedSize()
-        
-    }
-    
-    private var sortFilterPickerView: some View {
-        Picker("", selection: $viewModel.sortType) {
-            ForEach(WordCardSortFilter.allCases) { (viewType: WordCardSortFilter) in
-                Text(LocalizedStringKey(viewType.name)).tag(viewType)
-            }
-        }
-        .tint(Color.systemBlack)
-        .pickerStyle(.menu)
-        .fixedSize()
-        .onChange(of: viewModel.sortType) { _, newValue in
-            Task {
-                do {
-                    try await viewModel.fetchWords(filter: viewModel.filter)
-                } catch {
-                    
-                }
             }
         }
     }
     
 }
-struct CardHeightPreferenceKey: PreferenceKey {
-    nonisolated(unsafe) static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = max(value, nextValue())
+
+// 필터 버튼 컴포넌트
+private struct FilterButton<MenuContent: View>: View {
+    let icon: String
+    let title: String
+    @ViewBuilder let menu: () -> MenuContent
+
+    var body: some View {
+        Menu {
+            menu()
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.caption)
+                Text(LocalizedStringKey(title))
+                    .font(.subheadline)
+                Image(systemName: "chevron.down")
+                    .font(.caption2)
+            }
+            .foregroundStyle(Color.primary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Color(.tertiarySystemFill))
+            .clipShape(Capsule())
+        }
     }
 }
+fileprivate struct WordRowView: View {
 
-extension View {
-    func reportHeight() -> some View {
-        self.background(GeometryReader { geometry in
-            Color.clear.preference(key: CardHeightPreferenceKey.self, value: geometry.size.height)
-        })
-    }
-}
-
-
-
-fileprivate struct CardView2: View {
-    
     var item: CardItem
-    
     var viewType: WordCardViewType
-    
-    init(cardItem: CardItem, viewType: WordCardViewType) {
-        self.item = cardItem
+
+    init(item: CardItem, viewType: WordCardViewType) {
+        self.item = item
         self.viewType = viewType
     }
-    
+
     var body: some View {
-        
-        ZStack {
-            Color.element
-                .cornerRadius(30)
-                .northWestShadow(radius:1, offset: 2)
-            VStack {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
                 switch viewType {
                 case .all:
                     Text(item.word)
-                        .foregroundStyle(Color.systemBlack)
-                        .font(.headline)
-                        .lineLimit(1)
+                        .font(.body.weight(.medium))
+                        .foregroundStyle(Color.primary)
                     Text(item.meaning)
-                        .foregroundStyle(Color.systemBlack)
-                        .font(.body)
-                        .lineLimit(1)
+                        .font(.subheadline)
+                        .foregroundStyle(Color.secondary)
                 case .word:
                     Text(item.word)
-                        .foregroundStyle(Color.systemBlack)
-                        .font(.headline)
-                        .lineLimit(1)
+                        .font(.body.weight(.medium))
+                        .foregroundStyle(Color.primary)
                 case .meaning:
                     Text(item.meaning)
-                        .foregroundStyle(Color.systemBlack)
                         .font(.body)
-                        .lineLimit(1)
+                        .foregroundStyle(Color.primary)
                 }
-                
-                
             }
-            .padding(EdgeInsets.init(top: 7, leading: 10, bottom: 7, trailing: 10))
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(Color(.tertiaryLabel))
         }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 }
 
 
 #Preview {
     NavigationStack {
-        List {
-            Text("hihi")
-            
-            WordCardView2(viewModel: WordCardViewModel(dbService: MainHomeMockDIContainer().makeDBImplementation()))
-                .frame(height: 400)
-            
-        }
+        WordCardView2(viewModel: WordCardViewModel(dbService: MainHomeMockDIContainer().makeDBImplementation()))
     }
-    
 }

@@ -31,27 +31,28 @@ struct WriteView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                VStack {
-                    ScrollView {
-                        VStack(alignment: .leading) {
-                            wordSection
-                            meaningSection
-                            tagSection
-                        }
-                        .padding(.top, 10)
+                ScrollView {
+                    VStack(spacing: 16) {
+                        wordSection
+                        meaningSection
+                        tagSection
                     }
-                    .scrollBounceBehavior(.basedOnSize)
-                    
+                    .padding(.horizontal, 16)
+                    .padding(.top, 26)
+                    .padding(.bottom, 80)
+                }
+                .safeAreaInset(edge: .bottom) {
                     confirmButton
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .background(.ultraThinMaterial)
                 }
                 .coordinateSpace(name: "VStack")
-                .padding()
                 .task(onTask)
                 .toolbar { keyboardToolbar }
                 .onTapGesture { field = nil }
-                //                }
                 .allowsHitTesting(!showOnboarding)
-                
+
                 if showOnboarding {
                     tooltipOverlay(geometry: geometry)
                 }
@@ -61,20 +62,21 @@ struct WriteView: View {
     
     // MARK: - Subviews
     private var wordSection: some View {
-         VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text("단어")
-                    .font(.headline)
-                    .padding(.leading)
-                    .foregroundStyle(field == .word ? Color.systemBlack : Color.gray)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.primary)
                 Spacer()
                 Text("\(viewModel.wordCount)/\(viewModel.maxWordCount)")
-                    .font(.footnote)
-                    .padding(.trailing)
-                    .foregroundStyle(field == .word ? Color.systemBlack : Color.gray)
+                    .font(.caption)
+                    .foregroundStyle(Color.secondary)
             }
-             
-            WMTextField(placeHolder: "단어를 입력해주세요.", text: $viewModel.word)
+
+            TextField("단어를 입력해주세요.", text: $viewModel.word)
+                .padding(14)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 .background(offsetReader(for: \.word))
                 .focused($field, equals: .word)
                 .onChange(of: viewModel.word) { oldValue, newValue in
@@ -82,38 +84,37 @@ struct WriteView: View {
                 }
                 .onSubmit { field = .meaning }
         }
-        .padding(.bottom, 10)
     }
-    
+
     private var meaningSection: some View {
-         VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text("뜻")
-                    .font(.headline)
-                    .padding(.leading)
-                    .foregroundStyle(field == .meaning ? Color.systemBlack : Color.gray)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.primary)
                 Spacer()
                 Text("\(viewModel.meaningCount)/\(viewModel.maxWordMeaning)")
-                    .font(.footnote)
-                    .padding(.trailing)
-                    .foregroundStyle(field == .meaning ? Color.systemBlack : Color.gray)
+                    .font(.caption)
+                    .foregroundStyle(Color.secondary)
             }
-            WMTextField(placeHolder: "뜻을 입력해주세요.", text: $viewModel.meaning)
+
+            TextField("뜻을 입력해주세요.", text: $viewModel.meaning)
+                .padding(14)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 .background(offsetReader(for: \.meaning))
                 .focused($field, equals: .meaning)
                 .onChange(of: viewModel.meaning) { oldValue, newValue in
                     updateMeaningCount(oldValue: oldValue, newValue: newValue)
                 }
         }
-        .padding(.bottom, 10)
     }
-    
+
     private var tagSection: some View {
         WriteSelectExpandableTagView(viewModel: viewModel.writeTagViewModel)
-            .padding([.leading, .trailing])
             .background(offsetReader(for: \.tag))
     }
-    
+
     private var confirmButton: some View {
         ConfirmButton(viewModel: viewModel)
             .background(offsetReader(for: \.done))
@@ -123,6 +124,11 @@ struct WriteView: View {
         Group {
             Color.black.opacity(0.3)
                 .ignoresSafeArea()
+                .onTapGesture {
+                    withAnimation {
+                        updateHintType()
+                    }
+                }
             WMTooltipView(text: tooltipText, location: .centerBottom) {
                 updateHintType()
             }
@@ -265,32 +271,37 @@ private struct ConfirmButton: View {
     @Environment(\.dismiss) var dismiss
     @State var needAlert: Bool = false
     @State var errorMessage: String = ""
-    
+
     init(viewModel: WriteViewModel) {
         self.viewModel = viewModel
     }
-    
+
     var body: some View {
         Button {
-            print("확인")
             save()
-            
         } label: {
-            Text("확인")
+            Text("저장")
+                .font(.headline)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+//                .background(Color.systemBlack)
+//                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
-        .frame(height: 50)
-        .buttonStyle(WMButtonStyle())
         .alert(LocalizedStringKey(errorMessage), isPresented: $needAlert,
-               presenting: errorMessage) { errorMessage in
-            
-        } message: { errorMessage in
-            //            Text("\(errorMessage)")
+               presenting: errorMessage) { _ in
+        } message: { _ in
         }
         .focusable(interactions: .activate)
-//        .keyboardShortcut(.return)
-//        .keyboardShortcut(.return, modifiers: [])
+        .versioned { view in
+            if #available(iOS 26.0, *) {
+                view.glassEffect(.regular.tint(Color.systemBlack))
+            } else {
+                view
+            }
+        }
     }
-    
+
     func save() {
         Task {
             do {
@@ -300,7 +311,6 @@ private struct ConfirmButton: View {
             } catch {
                 needAlert = true
                 errorMessage = error.localizedDescription
-                print(errorMessage)
             }
         }
     }

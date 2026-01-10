@@ -43,97 +43,101 @@ struct EditView: View {
     
     
     var body: some View {
-            VStack {
-                ScrollView {
-                    VStack(alignment: .leading) {
-                        HStack {
-                            Text("단어")
-                                .font(.headline)
-                                .padding(.leading)
-                                .foregroundStyle(field == .word ? Color.systemBlack : Color.gray)
-                            Spacer()
-                            Text("\(viewModel.wordCount)/\(viewModel.maxWordCount)")
-                                .font(.footnote)
-                                .padding(.trailing)
-                                .foregroundStyle(field == .word ? Color.systemBlack : Color.gray)
-                        }
-                        
-                        WMTextField(placeHolder: "단어를 입력해주세요.", text: $viewModel.word)
-                            .focused($field, equals: .word)
-                            .onSubmit {
-                                field = .meaning
-                            }
-                            .onChange(of: viewModel.word, { oldValue, newValue in
-                                if newValue.count > viewModel.maxWordCount {
-                                    viewModel.word = oldValue
-                                    viewModel.wordCount = oldValue.count
-                                } else {
-                                    viewModel.wordCount = newValue.count
-                                }
-                                
-                            })
-                    }
-                    .padding(.bottom, 10)
-                    
-                    
-                    VStack(alignment: .leading) {
-                        HStack {
-                            Text("뜻")
-                                .font(.headline)
-                                .padding(.leading)
-                                .foregroundStyle(field == .meaning ? Color.systemBlack : Color.gray)
-                            Spacer()
-                            Text("\(viewModel.meaningCount)/\(viewModel.maxWordMeaning)")
-                                .font(.footnote)
-                                .padding(.trailing)
-                                .foregroundStyle(field == .word ? Color.systemBlack : Color.gray)
-                            
-                        }
-                        WMTextField(placeHolder: "단어를 입력해주세요.", text: $viewModel.meaning)
-                            .focused($field, equals: .meaning)
-                            .onChange(of: viewModel.meaning, { oldValue, newValue in
-                                if newValue.count > viewModel.maxWordMeaning {
-                                    viewModel.meaning = oldValue
-                                    viewModel.meaningCount = oldValue.count
-                                } else {
-                                    viewModel.meaningCount = newValue.count
-                                }
-                            })
-                    }
-                    .padding(.bottom, 10)
-                    
-                    
-                    EditSelectExpandableTagView(viewModel: viewModel.editTagViewModel)
-                    //                    .frame(height:150)
-                        .padding([.leading, .trailing])
-                }
-                .scrollBounceBehavior(.basedOnSize)
-                ConfirmButton(viewModel: viewModel)
+        ScrollView {
+            VStack(spacing: 16) {
+                wordSection
+                meaningSection
+                EditSelectExpandableTagView(viewModel: viewModel.editTagViewModel)
             }
-            .padding()
-            .task {
-                
-                field = .word
-                do {
-                    try await viewModel.fetchWord()
-                } catch {
-                    
-                }
-            }
-            .toolbar {
-                ToolbarItemGroup(placement: .keyboard) {
-                    HStack {
-                        Spacer()   
-                        Button("확인") {
-                            field = field?.nextField
-                        }
-                    }
-                }
-            }
-            .onTapGesture {
-                field = nil
+            .padding(.horizontal, 16)
+            .padding(.top, 26)
+            .padding(.bottom, 80)
+        }
+        .safeAreaInset(edge: .bottom) {
+            ConfirmButton(viewModel: viewModel)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(.ultraThinMaterial)
+        }
+        .task {
+            field = .word
+            do {
+                try await viewModel.fetchWord()
+            } catch {
             }
         }
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                HStack {
+                    Spacer()
+                    Button("확인") {
+                        field = field?.nextField
+                    }
+                }
+            }
+        }
+        .onTapGesture {
+            field = nil
+        }
+    }
+
+    // MARK: - Subviews
+    private var wordSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("단어")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.primary)
+                Spacer()
+                Text("\(viewModel.wordCount)/\(viewModel.maxWordCount)")
+                    .font(.caption)
+                    .foregroundStyle(Color.secondary)
+            }
+
+            TextField("단어를 입력해주세요.", text: $viewModel.word)
+                .padding(14)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .focused($field, equals: .word)
+                .onSubmit { field = .meaning }
+                .onChange(of: viewModel.word) { oldValue, newValue in
+                    if newValue.count > viewModel.maxWordCount {
+                        viewModel.word = oldValue
+                        viewModel.wordCount = oldValue.count
+                    } else {
+                        viewModel.wordCount = newValue.count
+                    }
+                }
+        }
+    }
+
+    private var meaningSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("뜻")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.primary)
+                Spacer()
+                Text("\(viewModel.meaningCount)/\(viewModel.maxWordMeaning)")
+                    .font(.caption)
+                    .foregroundStyle(Color.secondary)
+            }
+
+            TextField("뜻을 입력해주세요.", text: $viewModel.meaning)
+                .padding(14)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .focused($field, equals: .meaning)
+                .onChange(of: viewModel.meaning) { oldValue, newValue in
+                    if newValue.count > viewModel.maxWordMeaning {
+                        viewModel.meaning = oldValue
+                        viewModel.meaningCount = oldValue.count
+                    } else {
+                        viewModel.meaningCount = newValue.count
+                    }
+                }
+        }
+    }
 }
 
 private struct ConfirmButton: View {
@@ -141,14 +145,13 @@ private struct ConfirmButton: View {
     @Environment(\.dismiss) var dismiss
     @State var needAlert: Bool = false
     @State var errorMessage: String = ""
-    
+
     init(viewModel: EditViewModel) {
         self.viewModel = viewModel
     }
-    
+
     var body: some View {
         Button {
-            print("수정")
             Task {
                 do {
                     try viewModel.checkRequiredWord()
@@ -159,18 +162,19 @@ private struct ConfirmButton: View {
                     errorMessage = error.localizedDescription
                 }
             }
-            
         } label: {
-            Text("확인")
+            Text("저장")
+                .font(.headline)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(Color.systemBlack)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
-        .frame(height: 50)
-        .buttonStyle(WMButtonStyle())
         .alert(LocalizedStringKey(errorMessage),
                isPresented: $needAlert,
-               presenting: errorMessage) { errorMessage in
-            
-        } message: { errorMessage in
-//            Text("\(errorMessage)")
+               presenting: errorMessage) { _ in
+        } message: { _ in
         }
         .focusable(interactions: .activate)
     }
