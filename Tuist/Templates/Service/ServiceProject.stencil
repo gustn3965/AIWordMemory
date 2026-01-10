@@ -1,0 +1,39 @@
+//
+//  ServiceFramework.swift
+//  AIGPTManifests
+//
+//  Created by 박현수 on 12/22/24.
+//
+
+import Foundation
+
+import ProjectDescription
+import ProjectDescriptionHelpers
+
+let project = Project.makeWM(
+    .wmProject(name: "{{ name }}Service",
+               targets: [
+                .templateStaticFrameworkTarget(name: "{{ name }}Interface",
+                                               projectName: "{{ name }}Service",
+                                               sources: [.path("Interface/Sources/**")],
+                                               resources: [.path("Interface/Resources/**")],
+                                               settings: .talkBaseProject(),
+                                               dependencies: [],
+                                               scripts: []),
+                
+                .templateDynamicFrameworkTarget(name: "{{ name }}Implementation",
+                                                projectName: "{{ name }}Service",
+                                                sources: [.path("Implementation/Sources/**")],
+                                                resources: [.path("Implementation/Resources/**")],
+                                        settings: .talkBaseProject(),
+                                                dependencies: [.target(name: "{{ name }}Interface")],
+                                        scripts: []),
+                .templateUnitTest(name: "{{ name }}ImplementationUnitTest",
+                                  projectName: "{{ name }}Service",
+                                  sources: [.path("Implementation/Tests/**")],
+                                  settings: .appTalkUnitTestTarget(),
+                                  dependencies: [.target(name: "{{ name }}Implementation")],
+                                  scripts: []),
+               ],
+               schemes: [])
+)

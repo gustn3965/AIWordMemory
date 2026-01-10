@@ -1,0 +1,46 @@
+//
+//  SampleView.swift
+//  AIManifests
+//
+//  Created by 박현수 on 12/22/24.
+//
+
+import SwiftUI
+
+
+
+public protocol {{ name }}Usecase {}
+struct {{ name }}MockUsecase: {{ name }}Usecase {}
+
+class {{ name }}ViewModel: ObservableObject {
+    
+    @Published var useCase: {{ name }}Usecase
+    
+    init(useCase: {{ name }}Usecase) {
+        self.useCase = useCase
+    }
+}
+
+public struct {{ name }}ContentView: View {
+    var diContainer: any {{ name }}DependencyInjection
+    @ObservedObject var viewModel: {{ name }}ViewModel
+    
+    public init(diContainer: any {{ name }}DependencyInjection) {
+        self.diContainer = diContainer
+        self.viewModel = {{ name }}ViewModel(useCase: diContainer.makeUseCasse())
+    }
+    
+    public var body: some View {
+        VStack {
+            Text("Hello, world!")
+        }
+        .padding()
+    }
+}
+
+struct {{ name }}ContentView_Preview: PreviewProvider {
+    
+    static var previews: some View {
+        {{ name }}ContentView(diContainer: {{ name }}MockDIContainer())
+    }
+}

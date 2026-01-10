@@ -1,0 +1,21 @@
+//
+//  DependencyInjection.swift
+//  AIManifests
+//
+//  Created by 박현수 on 12/22/24.
+//
+
+import Foundation
+
+
+
+public protocol {{ name }}DependencyInjection {
+    func makeUseCasse() -> {{ name }}Usecase
+}
+
+public struct {{ name }}MockDIContainer: {{ name }}DependencyInjection {
+    public init() {}
+    public func makeUseCasse() -> any {{ name }}Usecase {
+        {{ name }}MockUsecase()
+    }
+}

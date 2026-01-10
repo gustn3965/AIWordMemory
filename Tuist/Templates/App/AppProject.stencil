@@ -1,0 +1,31 @@
+//
+//  UIFrameworkProject.swift
+//  Packages
+//
+//  Created by 박현수 on 12/21/24.
+//
+
+import ProjectDescription
+import ProjectDescriptionHelpers
+
+let project = Project.makeWM(
+    .wmProject(name: "{{ name }}",
+               targets: [
+               .templateAppTarget(name: "{{ name }}",
+                                  projectName: "{{ name }}",
+                                  sources: [.path("Sources/**")],
+                                  resources: [.path("Resources/**")],
+                                  settings: .appTalkTarget(),
+                                  dependencies: [],
+                                  scripts: []),
+                
+                .templateUnitTest(name: "{{ name }}UnitTest",
+                                  projectName: "{{ name }}",
+                                  sources: [.path("Tests/**")],
+                                  settings: .appTalkUnitTestTarget(),
+                                  dependencies: [.target(name: "{{ name }}")],
+                                  scripts: [])
+               ],
+//               schemes: WMConfiguration.allCases.map { .scheme(configuration: $0, buildTargets: [.talkApp], testTargets: [.talkAppUnitTest]) })
+               schemes: [])
+)

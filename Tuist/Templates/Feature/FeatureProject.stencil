@@ -1,0 +1,43 @@
+//
+//  FeatureProject.swift
+//  AIGPTManifests
+//
+//  Created by 박현수 on 12/22/24.
+//
+
+import ProjectDescription
+import ProjectDescriptionHelpers
+
+let project = Project.makeWM(
+    .wmProject(name: "{{ name }}Feature",
+               targets: [
+                .templateDynamicFrameworkTarget(name: "{{ name }}",
+                                                projectName: "{{ name }}Feature",
+                                               sources: [.path("{{ name }}/Sources/**")],
+                                               resources: [.path("{{ name }}/Resources/**")],
+                                               settings: .talkBaseProject(),
+                                               dependencies: [],
+                                               scripts: []),
+                
+
+                .templateUnitTest(name: "{{ name }}UnitTest",
+                                  projectName: "{{ name }}Feature",
+                                  sources: [.path("{{ name }}/Tests/**")],
+                                  settings: .appTalkUnitTestTarget(),
+                                  dependencies: [.target(name: "{{ name }}")],
+                                  scripts: []),
+                
+                
+                
+                    .templateAppTarget(name: "{{ name }}SampleApp",
+                                       projectName: "{{ name }}Feature",
+                                       sources: [.path("SampleApp/Sources/**")],
+                                       resources: [.path("SampleApp/Resources/**")],
+                                       settings: .appTalkTarget(),
+                                       dependencies: [
+                                        .target(name: "{{ name }}"),
+                                       ], scripts: [])
+               ],
+//               schemes: WMConfiguration.allCases.map { .scheme(configuration: $0, buildTargets: [.talkApp], testTargets: [.talkAppUnitTest]) })
+               schemes: [])
+)
