@@ -11,6 +11,7 @@ import CommonUI
 public struct EmptyAddView: View {
     
     @Binding var showAddSheet: Bool
+    var namespace: Namespace.ID
     
     public var body: some View {
         
@@ -34,8 +35,12 @@ public struct EmptyAddView: View {
                         .padding(EdgeInsets.init(top: 20, leading: 30, bottom: 20, trailing: 30))
                     }
                 }
-                
                 .frame(width: 100, height: 100)
+                .versioned { view in
+                    if #available(iOS 26.0, *) {
+                        view.matchedTransitionSource(id: "add_write_from_empty", in: namespace)
+                    }
+                }
 //                .scrollDisabled(true)
             }
             .padding(.bottom, 10)
@@ -46,8 +51,9 @@ public struct EmptyAddView: View {
 }
 
 #Preview {
-    List {
-        EmptyAddView(showAddSheet: .constant(false))
+    @Namespace var ns
+    return List {
+        EmptyAddView(showAddSheet: .constant(false), namespace: ns)
             .listRowSeparator(.hidden)
     }
     .listStyle(.plain)

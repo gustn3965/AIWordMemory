@@ -14,6 +14,7 @@ public struct MainHomeView: View {
     @ObservedObject var appCoordinator: AppCoordinator
     @StateObject private var viewModel: MainHomeViewModel
     @Environment(\.isSearching) private var isSearching
+    @Namespace private var namespace
     
     private let diContainer: any MainHomeDependencyInjection
     
@@ -54,12 +55,29 @@ public struct MainHomeView: View {
         }
         .sheet(isPresented: $viewModel.addWordSheet) {
             WriteView(diContainer: diContainer)
+                .versioned { view in
+                    if #available(iOS 26.0, *) {
+                        
+                        view.navigationTransition(.zoom(sourceID: "add_write", in: namespace))
+                        
+                    }
+                }
         }
         .sheet(isPresented: $viewModel.showAddViewSheet) {
             WriteView(diContainer: diContainer)
+                .versioned { view in
+                    if #available(iOS 26.0, *) {
+                        view.navigationTransition(.zoom(sourceID: "add_write_from_empty", in: namespace))
+                    }
+                }
         }
         .sheet(isPresented: $appCoordinator.showWriteView) {
             WriteView(diContainer: diContainer)
+                .versioned { view in
+                    if #available(iOS 26.0, *) {
+                        view.navigationTransition(.zoom(sourceID: "add_write_from_app", in: namespace))
+                    }
+                }
         }
         .runOnceTask(perform: setupViewModel)
         
@@ -69,7 +87,7 @@ public struct MainHomeView: View {
     private func mainList(geometry: GeometryProxy) -> some View {
         List {
             if viewModel.needEmptyAddView {
-                EmptyAddView(showAddSheet: $viewModel.showAddViewSheet)
+                EmptyAddView(showAddSheet: $viewModel.showAddViewSheet, namespace: namespace)
                     .listRowSeparator(.hidden)
             } else {
                 if viewModel.needTopExpandableTagView {
@@ -104,6 +122,12 @@ public struct MainHomeView: View {
             .buttonStyle(WMButtonStyle())
             .frame(width: UIDevice.current.userInterfaceIdiom == .pad ? 80 : 60, height: UIDevice.current.userInterfaceIdiom == .pad ? 80 : 60)
             .focusable(interactions: .activate)
+            .versioned { view in
+                if #available(iOS 26.0, *) {
+                    view.matchedTransitionSource(id: "add_write", in: namespace)
+                }
+            }
+            
 //            .focused($addWriteButtonFocus)
 ////            .focusEffectDisabled()
 //            .onKeyPress(.tab) {
