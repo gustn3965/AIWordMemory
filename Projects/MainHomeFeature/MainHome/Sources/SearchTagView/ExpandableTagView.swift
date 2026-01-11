@@ -21,40 +21,28 @@ public struct SearchExpandableTagview: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // 헤더 (탭하면 펼침/접힘)
-            Button {
-                withAnimation(.easeInOut(duration: 0.25)) {
-                    expandTagView.toggle()
-                }
-            } label: {
-                HStack(spacing: 10) {
-                    Image(systemName: "tag.fill")
-                        .font(.body)
-                        .foregroundStyle(Color.accentColor)
-
-                    // 선택된 태그들 가로로 표시
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 6) {
-                            ForEach(viewModel.selectedItems) { item in
-                                SelectedTagBadge(title: item.title)
-                            }
+            HStack(spacing: 10) {
+                ZStack(alignment: .leading) {
+                    Button {
+                        viewModel.selectAllItem()
+                    } label: {
+                        Image(systemName: "tag.circle.fill")
+                            .resizable()
+                            .frame(width: 25, height: 25)
+                            .foregroundStyle(Color.systemBlack)
+                    }
+                    .versioned { view in
+                        if #available(iOS 26.0, *) {
+                            view.buttonStyle(.glass)
+                        } else {
+                            view
                         }
                     }
-
-                    Image(systemName: expandTagView ? "chevron.up" : "chevron.down")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(Color(.tertiaryLabel))
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(Color(.secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-            }
-            .buttonStyle(.plain)
-
-            // 펼쳐진 태그 목록
-            if expandTagView {
-                VStack(alignment: .leading, spacing: 12) {
-                    // 한 줄 수평 스크롤
+                    .zIndex(2)
+                    .padding(.leading, 16)
+                    
+                    
+                    // 선택된 태그들 가로로 표시
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
                             ForEach(viewModel.items) { item in
@@ -67,29 +55,57 @@ public struct SearchExpandableTagview: View {
                             }
                         }
                         .padding(.horizontal, 16)
+                        .offset(x: 37 + 16)
+                        .padding(.trailing, 37 + 16)
+                        
                     }
-
-                    // 모든 태그 선택 버튼
-                    Button {
-                        viewModel.selectAllItem()
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: viewModel.isAllSelected() ? "checkmark.circle.fill" : "circle")
-                                .foregroundStyle(viewModel.isAllSelected() ? Color.accentColor : Color(.tertiaryLabel))
-                            Text("모든 태그 선택")
-                                .font(.subheadline)
-                                .foregroundStyle(Color.primary)
-                        }
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 4)
+                    .zIndex(1)
                 }
-                .padding(.vertical, 12)
-                .background(Color(.secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                .padding(.top, 8)
-                .transition(.opacity.combined(with: .move(edge: .top)))
             }
+            .padding(.horizontal, 0)
+            .padding(.vertical, 10)
+//            .background(Color(.secondarySystemGroupedBackground))
+//            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+//            // 펼쳐진 태그 목록
+//            if expandTagView {
+//                VStack(alignment: .leading, spacing: 12) {
+//                    // 한 줄 수평 스크롤
+//                    ScrollView(.horizontal, showsIndicators: false) {
+//                        HStack(spacing: 8) {
+//                            ForEach(viewModel.items) { item in
+//                                TagChip(
+//                                    title: item.title,
+//                                    isSelected: viewModel.isSelecteditem(item: item)
+//                                ) {
+//                                    viewModel.setSelectedItem(item: item)
+//                                }
+//                            }
+//                        }
+//                        .padding(.horizontal, 16)
+//                    }
+//
+//                    // 모든 태그 선택 버튼
+//                    Button {
+//                        viewModel.selectAllItem()
+//                    } label: {
+//                        HStack(spacing: 6) {
+//                            Image(systemName: viewModel.isAllSelected() ? "checkmark.circle.fill" : "circle")
+//                                .foregroundStyle(viewModel.isAllSelected() ? Color.accentColor : Color(.tertiaryLabel))
+//                            Text("모든 태그 선택")
+//                                .font(.subheadline)
+//                                .foregroundStyle(Color.primary)
+//                        }
+//                    }
+//                    .padding(.horizontal, 16)
+//                    .padding(.bottom, 4)
+//                }
+//                .padding(.vertical, 12)
+//                .background(Color(.secondarySystemGroupedBackground))
+//                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+//                .padding(.top, 8)
+//                .transition(.opacity.combined(with: .move(edge: .top)))
+//            }
         }
         .padding(.vertical, 8)
         .runOnceTask {
@@ -135,7 +151,7 @@ private struct TagChip: View {
             .foregroundStyle(isSelected ? Color.systemWhite : Color.primary)
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(isSelected ? Color.accentColor : Color(.tertiarySystemFill))
+            .background(isSelected ? Color.systemBlack : Color(.tertiarySystemFill))
             .clipShape(Capsule())
         }
         .buttonStyle(.plain)

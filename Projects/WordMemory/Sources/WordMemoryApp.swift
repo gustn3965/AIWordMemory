@@ -126,13 +126,6 @@ struct ContentView: View {
                     settingsTab()
                 }
                 .tabViewStyle(.sidebarAdaptable)
-                .versioned { view in
-                    if #available(iOS 26.0, *) {
-                        view.tabBarMinimizeBehavior(.onScrollDown)
-                    } else {
-                        view
-                    }
-                }
                 .tint(.systemBlack)
                 .edgesIgnoringSafeArea(.all)
             } else {

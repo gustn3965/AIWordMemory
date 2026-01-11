@@ -24,13 +24,27 @@ public struct WordCardView2: View {
     public var body: some View {
         // 단어 리스트
         ScrollView {
-                LazyVStack(spacing: 0) {
-                    // 태그 필터
-                    if let tagVM = tagViewModel {
-                        SearchExpandableTagview(viewModel: tagVM)
-                    }
+            LazyVStack(spacing: 0) {
+                // 태그 필터
+                if let tagVM = tagViewModel {
+                    SearchExpandableTagview(viewModel: tagVM)
+                }
+                
+                // 단어 목록
+                if viewModel.items.isEmpty {
+                    // 빈 상태
+                    VStack(spacing: 12) {
+                        Image(systemName: "doc.text.magnifyingglass")
+                            .font(.system(size: 40))
+                            .foregroundStyle(Color.secondary)
 
-                    // 단어 목록
+                        Text(String(localized: "no_filtered_words"))
+                            .font(.headline)
+                            .foregroundStyle(Color.primary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 60)
+                } else {
                     LazyVStack(spacing: 8) {
                         ForEach(viewModel.items) { item in
                             NavigationLink(value: item) {
@@ -42,6 +56,7 @@ public struct WordCardView2: View {
                     .padding(.vertical, 8)
                 }
             }
+        }
         .onChange(of: viewModel.sortType) { _, _ in
             Task {
                 try? await viewModel.fetchWords(filter: viewModel.filter)

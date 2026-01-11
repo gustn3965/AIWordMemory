@@ -91,7 +91,11 @@ struct SearchTagItem: Equatable, Identifiable {
     }
     
     func selectAllItem() {
-        selectedItems = items
+        if isAllSelected() {
+            selectedItems = []
+        } else {
+            selectedItems = items
+        }
     }
     
     func isAllSelected() -> Bool {

@@ -28,9 +28,9 @@ import AccountInterface
         }
         let tag1: WordTag = .init(identity: UUID().uuidString, name: "verb")
         let tag2: WordTag = .init(identity: UUID().uuidString, name: "noun")
-        let tag3: WordTag = .init(identity: UUID().uuidString, name: "edjcnk")
-        let tag4: WordTag = .init(identity: UUID().uuidString, name: "기나긴태그여행")
-        let tag5: WordTag = .init(identity: UUID().uuidString, name: "허니문여행여행")
+        let tag3: WordTag = .init(identity: UUID().uuidString, name: "형용사")
+        let tag4: WordTag = .init(identity: UUID().uuidString, name: "동사")
+        let tag5: WordTag = .init(identity: UUID().uuidString, name: "일상생활영어")
         
         let sentences: [WordMemorySentence] = [
             WordMemorySentence(identity: UUID().uuidString,

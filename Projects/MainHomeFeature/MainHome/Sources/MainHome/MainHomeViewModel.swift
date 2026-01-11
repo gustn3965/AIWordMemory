@@ -24,7 +24,7 @@ import AppEntity
     
     // need view
     @Published var needTopExpandableTagView: Bool = false
-    @Published var needEmptyAddView: Bool = false
+    @Published var needEmptyAddView: Bool = true
     
     
     // sheet

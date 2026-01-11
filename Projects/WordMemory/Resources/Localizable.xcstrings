@@ -1,6 +1,12 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "?" : {
+
+    },
+    "%@" : {
+
+    },
     "%lld번 맞춤" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -254,6 +260,17 @@
         }
       }
     },
+    "100회 추가 제공" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+100 Credits"
+          }
+        }
+      }
+    },
     "100회 추가 제공!" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -261,6 +278,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "+100 Credits!"
+          }
+        }
+      }
+    },
+    "200회 추가 제공" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+200 Credits"
           }
         }
       }
@@ -283,6 +311,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "AI Word"
+          }
+        }
+      }
+    },
+    "AI 검색" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Search"
+          }
+        }
+      }
+    },
+    "AI 기능이 충전되었습니다!" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI features have been recharged!"
           }
         }
       }
@@ -342,6 +392,17 @@
         }
       }
     },
+    "AI 생성중..." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generating..."
+          }
+        }
+      }
+    },
     "AI 생성중입니다..." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -397,6 +458,28 @@
         }
       }
     },
+    "AI가 레벨에 맞는 단어를 추천합니다" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI recommends words for your level"
+          }
+        }
+      }
+    },
+    "AI가 문장의 문법과 표현을 검사합니다" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI checks grammar and expressions"
+          }
+        }
+      }
+    },
     "AI검색" : {
       "localizations" : {
         "en" : {
@@ -413,6 +496,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "AI Suggest"
+          }
+        }
+      }
+    },
+    "AI에서 추천하는 단어로써 단어가 부족할 수 있습니다. 참고용으로 사용하세요." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Words recommended by AI may be limited. Use them as a reference."
           }
         }
       }
@@ -439,11 +533,17 @@
         }
       }
     },
+    "Inevitable" : {
+
+    },
     "Key" : {
       "extractionState" : "manual"
     },
     "Key 6" : {
       "extractionState" : "manual"
+    },
+    "Procrastination" : {
+
     },
     "가장 기초적인 단어" : {
       "extractionState" : "manual",
@@ -495,6 +595,28 @@
         }
       }
     },
+    "검사할 문장" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sentence to Check"
+          }
+        }
+      }
+    },
+    "검사할 문장을 입력하세요" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter the sentence to check"
+          }
+        }
+      }
+    },
     "검사할 문장을 입력하세요." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -502,6 +624,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter the sentence to check."
+          }
+        }
+      }
+    },
+    "검색 언어" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search Language"
+          }
+        }
+      }
+    },
+    "검색어" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search Word"
+          }
+        }
+      }
+    },
+    "검색할 단어를 입력하세요" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a word to search"
           }
         }
       }
@@ -605,6 +760,28 @@
         }
       }
     },
+    "구매 완료" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Purchase Complete"
+          }
+        }
+      }
+    },
+    "구매 후 즉시 적용됩니다" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied immediately after purchase"
+          }
+        }
+      }
+    },
     "구매완료!" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -693,6 +870,17 @@
         }
       }
     },
+    "다시 시도" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry"
+          }
+        }
+      }
+    },
     "단어" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -700,17 +888,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Word"
-          }
-        }
-      }
-    },
-    "단어 추가" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add Word"
           }
         }
       }
@@ -726,6 +903,17 @@
         }
       }
     },
+    "단어 설명" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Word Description"
+          }
+        }
+      }
+    },
     "단어 설명:" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -737,6 +925,17 @@
         }
       }
     },
+    "단어 작성 시 태그를 추가할 수 있습니다" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can add tags when creating words"
+          }
+        }
+      }
+    },
     "단어 저장하기" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -744,6 +943,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Save Word"
+          }
+        }
+      }
+    },
+    "단어 추가" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Word"
+          }
+        }
+      }
+    },
+    "단어 학습 방식을 선택하세요" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose your learning style"
           }
         }
       }
@@ -792,6 +1013,17 @@
         }
       }
     },
+    "단어장에 저장" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to Wordbook"
+          }
+        }
+      }
+    },
     "대화형" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -799,6 +1031,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Conversational"
+          }
+        }
+      }
+    },
+    "더 많은 AI 기능을 사용해보세요" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock more AI features"
           }
         }
       }
@@ -891,6 +1134,17 @@
         }
       }
     },
+    "레벨별 단어 추천" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Word Recommendations by Level"
+          }
+        }
+      }
+    },
     "리뷰" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -898,6 +1152,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Review"
+          }
+        }
+      }
+    },
+    "리뷰 설정" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Review Settings"
           }
         }
       }
@@ -946,6 +1211,17 @@
         }
       }
     },
+    "리뷰를 하시면 AI가 생성해줘요" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI generates content when you review"
+          }
+        }
+      }
+    },
     "리뷰를 하시면 AI가 생성해줘요." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -953,6 +1229,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "AI generates content when you review."
+          }
+        }
+      }
+    },
+    "리뷰종료" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End Review"
           }
         }
       }
@@ -975,6 +1262,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "This coupon has expired."
+          }
+        }
+      }
+    },
+    "맞음" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Correct"
           }
         }
       }
@@ -1023,6 +1321,50 @@
         }
       }
     },
+    "모든 태그 선택" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select All Tags"
+          }
+        }
+      }
+    },
+    "모르는 단어를 AI에게 물어보세요" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask AI about unknown words"
+          }
+        }
+      }
+    },
+    "문장 검사" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sentence Check"
+          }
+        }
+      }
+    },
+    "문장 생성에 실패했습니다" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to generate sentence"
+          }
+        }
+      }
+    },
     "문장검사" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1030,6 +1372,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sentence Check"
+          }
+        }
+      }
+    },
+    "버전 정보" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version Info"
           }
         }
       }
@@ -1045,6 +1398,17 @@
         }
       }
     },
+    "부연설명" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explanation"
+          }
+        }
+      }
+    },
     "부연설명:" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1052,6 +1416,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Explanation:"
+          }
+        }
+      }
+    },
+    "사용량" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usage"
           }
         }
       }
@@ -1089,6 +1464,39 @@
         }
       }
     },
+    "새 태그 추가" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add New Tag"
+          }
+        }
+      }
+    },
+    "새로운 버전이 출시되었습니다. 업데이트하여 새로운 기능을 사용해보세요." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A new version is available. Update to use new features."
+          }
+        }
+      }
+    },
+    "생성된 문장이 없습니다" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No sentences generated"
+          }
+        }
+      }
+    },
     "생성된 문장이 없습니다." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1122,6 +1530,17 @@
         }
       }
     },
+    "설명 언어" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explanation Language"
+          }
+        }
+      }
+    },
     "설명 언어:" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1140,6 +1559,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Settings"
+          }
+        }
+      }
+    },
+    "수정" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
           }
         }
       }
@@ -1231,6 +1661,61 @@
         }
       }
     },
+    "앱스토어에서 업데이트" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update on App Store"
+          }
+        }
+      }
+    },
+    "어떤 단어부터 시작할까요?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Which words first?"
+          }
+        }
+      }
+    },
+    "어떤 형식으로 AI가 만들어드릴까요?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What format should AI create?"
+          }
+        }
+      }
+    },
+    "어떤걸로 리뷰할까요?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What to review?"
+          }
+        }
+      }
+    },
+    "업데이트" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update"
+          }
+        }
+      }
+    },
     "업데이트 안내" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1253,6 +1738,28 @@
         }
       }
     },
+    "예문을 터치하면 읽어줍니다" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to hear the sentence"
+          }
+        }
+      }
+    },
+    "예시" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Example"
+          }
+        }
+      }
+    },
     "예시:" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1260,6 +1767,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Example Sentence:"
+          }
+        }
+      }
+    },
+    "올바른 문장" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Correct Sentence"
           }
         }
       }
@@ -1418,6 +1936,28 @@
         }
       }
     },
+    "저장" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        }
+      }
+    },
+    "저장되었습니다" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved"
+          }
+        }
+      }
+    },
     "저장완료" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1425,6 +1965,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Success to save"
+          }
+        }
+      }
+    },
+    "정답" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Answer"
           }
         }
       }
@@ -1561,6 +2112,17 @@
         }
       }
     },
+    "추천된 단어" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggested Words"
+          }
+        }
+      }
+    },
     "추천된 단어 %lld개" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1568,6 +2130,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Suggested Words: %lld"
+          }
+        }
+      }
+    },
+    "충전" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recharge"
           }
         }
       }
@@ -1649,6 +2222,17 @@
         }
       }
     },
+    "태그" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags"
+          }
+        }
+      }
+    },
     "태그 관리" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1656,6 +2240,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Manage Tags"
+          }
+        }
+      }
+    },
+    "태그 삭제" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Tag"
+          }
+        }
+      }
+    },
+    "태그 선택 (선택사항)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Tag (Optional)"
           }
         }
       }
@@ -1682,6 +2288,17 @@
         }
       }
     },
+    "태그가 없습니다" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Tags"
+          }
+        }
+      }
+    },
     "태그가 없습니다." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1704,6 +2321,28 @@
         }
       }
     },
+    "태그를 탭하여 이름을 수정하거나 삭제할 수 있습니다." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap a tag to edit or delete it."
+          }
+        }
+      }
+    },
+    "탭하여 확인" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to reveal"
+          }
+        }
+      }
+    },
     "틀린 순서" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1711,6 +2350,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wrong Order"
+          }
+        }
+      }
+    },
+    "틀림" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wrong"
           }
         }
       }
@@ -1770,6 +2420,17 @@
         }
       }
     },
+    "해석" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translation"
+          }
+        }
+      }
+    },
     "해석:" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1825,369 +2486,6 @@
         }
       }
     },
-    "문장 검사" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sentence Check"
-          }
-        }
-      }
-    },
-    "설명 언어" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Explanation Language"
-          }
-        }
-      }
-    },
-    "검사할 문장" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sentence to Check"
-          }
-        }
-      }
-    },
-    "검사할 문장을 입력하세요" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter the sentence to check"
-          }
-        }
-      }
-    },
-    "AI가 문장의 문법과 표현을 검사합니다" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AI checks grammar and expressions"
-          }
-        }
-      }
-    },
-    "부연설명" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Explanation"
-          }
-        }
-      }
-    },
-    "올바른 문장" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Correct Sentence"
-          }
-        }
-      }
-    },
-    "리뷰종료" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "End Review"
-          }
-        }
-      }
-    },
-    "추천된 단어" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suggested Words"
-          }
-        }
-      }
-    },
-    "모든 태그 선택" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select All Tags"
-          }
-        }
-      }
-    },
-    "레벨별 단어 추천" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Word Recommendations by Level"
-          }
-        }
-      }
-    },
-    "AI가 레벨에 맞는 단어를 추천합니다" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AI recommends words for your level"
-          }
-        }
-      }
-    },
-    "사용량" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Usage"
-          }
-        }
-      }
-    },
-    "충전" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recharge"
-          }
-        }
-      }
-    },
-    "리뷰 설정" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Review Settings"
-          }
-        }
-      }
-    },
-    "단어 학습 방식을 선택하세요" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose your learning style"
-          }
-        }
-      }
-    },
-    "어떤 단어부터 시작할까요?" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Which words first?"
-          }
-        }
-      }
-    },
-    "어떤걸로 리뷰할까요?" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "What to review?"
-          }
-        }
-      }
-    },
-    "어떤 형식으로 AI가 만들어드릴까요?" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "What format should AI create?"
-          }
-        }
-      }
-    },
-    "더 많은 AI 기능을 사용해보세요" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unlock more AI features"
-          }
-        }
-      }
-    },
-    "구매 후 즉시 적용됩니다" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied immediately after purchase"
-          }
-        }
-      }
-    },
-    "모르는 단어를 AI에게 물어보세요" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ask AI about unknown words"
-          }
-        }
-      }
-    },
-    "검색 언어" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Search Language"
-          }
-        }
-      }
-    },
-    "검색어" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Search Word"
-          }
-        }
-      }
-    },
-    "단어장에 저장" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save to Wordbook"
-          }
-        }
-      }
-    },
-    "저장되었습니다" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saved"
-          }
-        }
-      }
-    },
-    "버전 정보" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Version Info"
-          }
-        }
-      }
-    },
-    "앱스토어에서 업데이트" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Update on App Store"
-          }
-        }
-      }
-    },
-    "업데이트" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Update"
-          }
-        }
-      }
-    },
-    "새로운 버전이 출시되었습니다. 업데이트하여 새로운 기능을 사용해보세요." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A new version is available. Update to use new features."
-          }
-        }
-      }
-    },
-    "예문을 터치하면 읽어줍니다" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tap to hear the sentence"
-          }
-        }
-      }
-    },
-    "문장 생성에 실패했습니다" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Failed to generate sentence"
-          }
-        }
-      }
-    },
-    "다시 시도" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Retry"
-          }
-        }
-      }
-    },
     "힌트 보기" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2199,288 +2497,19 @@
         }
       }
     },
-    "틀림" : {
+    "no_filtered_words" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wrong"
+            "value" : "No filtered words"
           }
-        }
-      }
-    },
-    "맞음" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
+        },
+        "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Correct"
-          }
-        }
-      }
-    },
-    "태그가 없습니다" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No Tags"
-          }
-        }
-      }
-    },
-    "단어 작성 시 태그를 추가할 수 있습니다" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can add tags when creating words"
-          }
-        }
-      }
-    },
-    "태그를 탭하여 이름을 수정하거나 삭제할 수 있습니다." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tap a tag to edit or delete it."
-          }
-        }
-      }
-    },
-    "저장" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        }
-      }
-    },
-    "태그 선택 (선택사항)" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select Tag (Optional)"
-          }
-        }
-      }
-    },
-    "새 태그 추가" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add New Tag"
-          }
-        }
-      }
-    },
-    "태그" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tags"
-          }
-        }
-      }
-    },
-    "생성된 문장이 없습니다" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No sentences generated"
-          }
-        }
-      }
-    },
-    "리뷰를 하시면 AI가 생성해줘요" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AI generates content when you review"
-          }
-        }
-      }
-    },
-    "수정" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit"
-          }
-        }
-      }
-    },
-    "정답" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Answer"
-          }
-        }
-      }
-    },
-    "탭하여 확인" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tap to reveal"
-          }
-        }
-      }
-    },
-    "200회 추가 제공" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+200 Credits"
-          }
-        }
-      }
-    },
-    "100회 추가 제공" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+100 Credits"
-          }
-        }
-      }
-    },
-    "AI 검색" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AI Search"
-          }
-        }
-      }
-    },
-    "AI 생성중..." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Generating..."
-          }
-        }
-      }
-    },
-    "구매 완료" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Purchase Complete"
-          }
-        }
-      }
-    },
-    "AI 기능이 충전되었습니다!" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AI features have been recharged!"
-          }
-        }
-      }
-    },
-    "태그 삭제" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete Tag"
-          }
-        }
-      }
-    },
-    "AI에서 추천하는 단어로써 단어가 부족할 수 있습니다. 참고용으로 사용하세요." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Words recommended by AI may be limited. Use them as a reference."
-          }
-        }
-      }
-    },
-    "검색할 단어를 입력하세요" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a word to search"
-          }
-        }
-      }
-    },
-    "단어 설명" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Word Description"
-          }
-        }
-      }
-    },
-    "예시" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Example"
-          }
-        }
-      }
-    },
-    "해석" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Translation"
+            "value" : "필터링된 단어가 없습니다"
           }
         }
       }
