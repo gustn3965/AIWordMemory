@@ -13,7 +13,7 @@ extension WMTarget {
     
     public static func dbInterfaceService() -> WMTarget {
         let targetName = "DBInterface"
-        return .templateStaticFrameworkTarget(name: targetName,
+        return .templateDynamicFrameworkTarget(name: targetName,
                                               projectName: Self.dbServiceProjectName,
                                               infoPlist: defaultInfoPlist,
                                               sources: [.path("Interface/Sources/**")],

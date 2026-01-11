@@ -96,7 +96,7 @@ public class WordMemoryDIContainer: ReviewDependencyInjection,
         self.appleSpeechVoiceService = appleSpeechVoiceService
         self.accountService = accountService
         self.serverStatus = serverStatus
-        self.storeKit = storeKit
+        self.storeKit = storeKit        
     }
     
     public static func create() -> WordMemoryDIContainer {
@@ -110,7 +110,9 @@ public class WordMemoryDIContainer: ReviewDependencyInjection,
                                        purchaseTTSChances: Self.purchaseTTSChances())
         
 #if MOCK
-        let database = MockInMemoryDatabase.shared
+//        let database = MockInMemoryDatabase.shared
+//        let database = ScreenShotKoreaDataBase.shared // 앱스토어 스크린샷 업데이트용도
+        let database = ScreenShotEnglishDataBase.shared // 앱스토어 스크린샷 업데이트용도
         dbService = database
         aiService = AIMockImplementation()
         speechVoiceService = SpeechVoiceAppleManager.shared

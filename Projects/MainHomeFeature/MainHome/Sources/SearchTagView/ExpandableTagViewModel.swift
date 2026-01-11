@@ -81,9 +81,9 @@ struct SearchTagItem: Equatable, Identifiable {
     func setSelectedItem(item: SearchTagItem) {
         if isSelecteditem(item: item) {
             if let index = selectedItems.firstIndex(of: item) {
-                if selectedItems.count > 1 {
+//                if selectedItems.count > 1 {
                     selectedItems.remove(at: index)
-                }
+//                }
             }
         } else {
             selectedItems.append(item)

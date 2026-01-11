@@ -12,7 +12,7 @@ extension WMTarget {
     
     public static func aiInterfaceService() -> WMTarget {
         let targetName = "AIInterface"
-        return .templateStaticFrameworkTarget(name: targetName,
+        return .templateDynamicFrameworkTarget(name: targetName,
                                               projectName: Self.aiServiceProjectName,
                                               infoPlist: defaultInfoPlist,
                                               sources: [.path("Interface/Sources/**")],

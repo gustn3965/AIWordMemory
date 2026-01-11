@@ -12,7 +12,7 @@ extension WMTarget {
     
     public static func speechVoiceInterfaceService() -> WMTarget {
         let targetName = "SpeechVoiceInterface"
-        return .templateStaticFrameworkTarget(name: targetName,
+        return .templateDynamicFrameworkTarget(name: targetName,
                                               projectName: Self.speechVoiceServiceProjectName,
                                               infoPlist: defaultInfoPlist,
                                               sources: [.path("Interface/Sources/**")],

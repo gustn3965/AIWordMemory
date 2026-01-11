@@ -13,7 +13,7 @@ extension WMTarget {
     
     public static func appCoordinatorService() -> WMTarget {
         let targetName = "AppCoordinatorService"
-        return .templateStaticFrameworkTarget(name: targetName,
+        return .templateDynamicFrameworkTarget(name: targetName,
                                               projectName: Self.appCoordinatorServiceProjectName,
                                               infoPlist: defaultInfoPlist,
                                               sources: [.path("Implementation/Sources/**")],

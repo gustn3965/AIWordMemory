@@ -13,7 +13,7 @@ extension WMTarget {
     
     public static func clockImplementationService() -> WMTarget {
         let targetName = "ClockImplementation"
-        return .templateStaticFrameworkTarget(name: targetName,
+        return .templateDynamicFrameworkTarget(name: targetName,
                                               projectName: Self.clockServiceProjectName,
                                               infoPlist: defaultInfoPlist,
                                               sources: [.path("Implementation/Sources/**")],

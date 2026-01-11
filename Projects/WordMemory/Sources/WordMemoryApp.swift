@@ -61,7 +61,7 @@ struct WordMemoryApp: App {
 
 struct ContentView: View {
     // MARK: - Types
-    enum Tab: Hashable {
+    enum MainAppTab: Hashable {
         case main, review, search, recommend, setting
     }
     
@@ -74,7 +74,7 @@ struct ContentView: View {
     @StateObject private var rewardViewModel = RewardedViewModel()
     @StateObject private var bannerViewModel = BannerViewModel()
     
-    @State private var selectedTab: Tab = .main
+    @State private var selectedTab: MainAppTab = .main
     @State private var errorMessage: String = ""
     @State private var needRewardError: Bool = false
     @State private var successPurchaseAlert: Bool = false
@@ -117,24 +117,63 @@ struct ContentView: View {
         Group {
             if #available(iOS 18.0, *) {
                 TabView(selection: $selectedTab) {
-                    mainTab(adSize: adSize)
-                    reviewTab()
-                    searchTab // search, sentece 모듈 2개
-                    recommendWordTab
+                    Tab("홈", image: "ph_list-fill", value: .main) {
+                        mainTab(adSize: adSize)
+                    }
+                    Tab("리뷰", image: "material-symbols_rate-review-rounded", value: .review) {
+                        reviewTab()
+                    }
+                    Tab("AI검색", image: "mingcute_search-ai-fill-light", value: .search) {
+                        searchTab
+                    }
+                    Tab("AI단어추천", image: "bxs_collection-light", value: .recommend) {
+                        recommendWordTab
+                    }
+                    Tab("설정", systemImage: "gearshape.fill", value: .setting) {
+                        settingsTab()
+                    }
 //                    searchWordTab()
-//                    searchSentenceInspectorTab()
-                    settingsTab()
+//                    searchSentenceInspectorTab()x
                 }
                 .tabViewStyle(.sidebarAdaptable)
-                .tint(.systemBlack)
+                .tint(Color.gray)
                 .edgesIgnoringSafeArea(.all)
             } else {
                 TabView(selection: $selectedTab) {
                     mainTab(adSize: adSize)
+                        .tabItem {
+                            VStack {
+                                Image("ph_list-fill", bundle: CommonUIResources.bundle)
+                                    .foregroundColor(selectedTab == .main ? .blue : .gray)
+                                Text("홈")
+                                    .foregroundColor(selectedTab == .main ? .blue : .gray)
+                            }
+                        }
                     reviewTab()
+                        .tabItem {
+                            VStack {
+                                Image("material-symbols_rate-review-rounded", bundle: CommonUIResources.bundle)
+                                Text("리뷰")
+                            }
+                        }
                     searchTab
+                        .tabItem {
+                            VStack {
+                                Image("mingcute_search-ai-fill-light", bundle: CommonUIResources.bundle)
+                                Text("AI검색")
+                            }
+                        }
                     recommendWordTab
+                        .tabItem {
+                            VStack {
+                                Image("bxs_collection-light", bundle: CommonUIResources.bundle)
+                                Text("AI단어추천")
+                            }
+                        }
                     settingsTab()
+                        .tabItem {
+                            Label("설정", systemImage: "gearshape")
+                        }
                 }
                 .tint(.systemBlack)
                 .edgesIgnoringSafeArea(.all)
@@ -151,24 +190,12 @@ struct ContentView: View {
                     .frame(height: adSize.size.height)
             }
         }
-        .tabItem {
-            VStack {
-                Image("ph_list-fill", bundle: CommonUIResources.bundle)
-                Text("홈")
-            }
-        }
-        .tag(Tab.main)
+        .tag(MainAppTab.main)
     }
     
     private func reviewTab() -> some View {
         ReviewContentView(diContainer: diContainer, appCoordinator: appCoordinator)
-            .tabItem {
-                VStack {
-                    Image("material-symbols_rate-review-rounded", bundle: CommonUIResources.bundle)
-                    Text("리뷰")
-                }
-            }
-            .tag(Tab.review)
+            .tag(MainAppTab.review)
     }
     
     @State var searchType: SearchType = .word
@@ -217,13 +244,7 @@ struct ContentView: View {
             }
         }
         .background(Color(.systemGroupedBackground))
-        .tabItem {
-            VStack {
-                Image("mingcute_search-ai-fill-light", bundle: CommonUIResources.bundle)
-                Text("AI검색")
-            }
-        }
-        .tag(Tab.search)
+        .tag(MainAppTab.search)
     }
     
     private var searchWordTab: some View {
@@ -239,22 +260,13 @@ struct ContentView: View {
     
     private var recommendWordTab: some View {
         RecommendContentView(diContainer: diContainer, appCoordinator: appCoordinator)
-            .tabItem {
-                VStack {
-                    Image("bxs_collection-light", bundle: CommonUIResources.bundle)
-                    Text("AI단어추천")
-                }
-            }
-            .tag(Tab.recommend)
+            .tag(MainAppTab.recommend)
             
     }
     
     private func settingsTab() -> some View {
         SettingsContentView(diContainer: diContainer, appCoordinator: appCoordinator)
-            .tabItem {
-                Label("설정", systemImage: "gearshape")
-            }
-            .tag(Tab.setting)
+            .tag(MainAppTab.setting)
     }
     
     private func goToAppstoreButton() -> some View {

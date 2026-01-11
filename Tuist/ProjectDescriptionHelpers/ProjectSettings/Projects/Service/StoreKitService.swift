@@ -13,7 +13,7 @@ extension WMTarget {
     
     public static func storeKitService() -> WMTarget {
         let targetName = "StoreKitService"
-        return .templateStaticFrameworkTarget(name: targetName,
+        return .templateDynamicFrameworkTarget(name: targetName,
                                               projectName: Self.storeKitServiceProjectName,
                                               infoPlist: defaultInfoPlist,
                                               sources: [.path("Implementation/Sources/**")],

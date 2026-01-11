@@ -98,7 +98,7 @@ private struct SettingsRow: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 24, height: 24)
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(Color.systemBlack)
 
             Text(LocalizedStringKey(item.name))
                 .foregroundStyle(Color.primary)

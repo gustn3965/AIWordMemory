@@ -138,32 +138,32 @@ public struct MainHomeView: View {
         .sheet(isPresented: $viewModel.addWordSheet) {
             WriteView(diContainer: diContainer)
                 .versioned { view in
-                    if #available(iOS 26.0, *) {
-                        view.navigationTransition(.zoom(sourceID: "add_write", in: namespace))
-                    } else {
+//                    if #available(iOS 26.0, *) {
+//                        view.navigationTransition(.zoom(sourceID: "add_write", in: namespace))
+//                    } else {
                         view
-                    }
+//                    }
                 }
                 
         }
         .sheet(isPresented: $viewModel.showAddViewSheet) {
             WriteView(diContainer: diContainer)
                 .versioned { view in
-                    if #available(iOS 26.0, *) {
-                        view.navigationTransition(.zoom(sourceID: "add_write_from_empty", in: namespace))
-                    } else {
+//                    if #available(iOS 26.0, *) {
+//                        view.navigationTransition(.zoom(sourceID: "add_write_from_empty", in: namespace))
+//                    } else {
                         view
-                    }
+//                    }
                 }
         }
         .sheet(isPresented: $appCoordinator.showWriteView) {
             WriteView(diContainer: diContainer)
                 .versioned { view in
-                    if #available(iOS 26.0, *) {
-                        view.navigationTransition(.zoom(sourceID: "add_write_from_app", in: namespace))
-                    } else {
+//                    if #available(iOS 26.0, *) {
+//                        view.navigationTransition(.zoom(sourceID: "add_write_from_app", in: namespace))
+//                    } else {
                         view
-                    }
+//                    }
                 }
         }
         .runOnceTask(perform: setupViewModel)
@@ -202,7 +202,7 @@ public struct MainHomeView: View {
                         
                     } else {
                         view.font(.title2.weight(.semibold))
-                            .foregroundStyle(Color.accentColor)
+                            .foregroundStyle(Color.systemBlack)
                             .frame(width: 40, height: 40)
                             .background(Color.systemWhite)
                             .clipShape(Circle())

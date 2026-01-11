@@ -13,7 +13,7 @@ extension WMTarget {
     
     public static func accountInterfaceService() -> WMTarget {
         let targetName = "AccountInterface"
-        return .templateStaticFrameworkTarget(name: targetName,
+        return .templateDynamicFrameworkTarget(name: targetName,
                                               projectName: Self.accountServiceProjectName,
                                               infoPlist: defaultInfoPlist,
                                               sources: [.path("Interface/Sources/**")],

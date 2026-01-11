@@ -542,6 +542,23 @@
     "Key 6" : {
       "extractionState" : "manual"
     },
+    "no_filtered_words" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No filtered words"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "필터링된 단어가 없습니다"
+          }
+        }
+      }
+    },
     "Procrastination" : {
 
     },
@@ -2493,23 +2510,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Show Hint"
-          }
-        }
-      }
-    },
-    "no_filtered_words" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No filtered words"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "필터링된 단어가 없습니다"
           }
         }
       }

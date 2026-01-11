@@ -31,7 +31,7 @@ public struct EmptyAddView: View {
                     .foregroundStyle(Color.systemWhite)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
-                    .background(Color.accentColor)
+                    .background(Color.systemBlack)
                     .clipShape(Capsule())
             }
             .versioned { view in
