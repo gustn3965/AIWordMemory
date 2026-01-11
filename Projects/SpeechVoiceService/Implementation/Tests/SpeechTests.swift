@@ -23,7 +23,7 @@ struct AIGPTManagerTests {
   
     @Test("tts 횟수가 0이면 받아오지못한다")
     func cantfetchAIIfGPT() async throws {
-        let mockAccountManager = AccountManagerMock(account: AccountSetting(identity: UUID().uuidString, chatGPTChances: 1, ttsChances: 0, isSubscriber: 0, lastUpdated: .now))
+        let mockAccountManager = AccountManagerMock(account: AccountSetting(identity: UUID().uuidString, chatGPTChances: 1, ttsChances: 0, lastUpdated: .now, usedCouponList: []))
         
         let gptManager = SpeechVoiceGPTManager.shared
         await gptManager.setAccountManager(accountManager: mockAccountManager)

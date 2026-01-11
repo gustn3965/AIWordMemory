@@ -1,12 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "?" : {
-
-    },
-    "%@" : {
-
-    },
     "%lld번 맞춤" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -533,9 +527,6 @@
         }
       }
     },
-    "Inevitable" : {
-
-    },
     "Key" : {
       "extractionState" : "manual"
     },
@@ -558,9 +549,6 @@
           }
         }
       }
-    },
-    "Procrastination" : {
-
     },
     "가장 기초적인 단어" : {
       "extractionState" : "manual",

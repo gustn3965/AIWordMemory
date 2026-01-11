@@ -114,7 +114,7 @@ public enum SettingMenuList: Int, Identifiable, Hashable  {
     }
     
 }
-public class SettingsMockDIContainer: SettingsDependencyInjection {
+public class SettingsMockDIContainer: SettingsDependencyInjection, ObservableObject {
     
     private var dbService: DataBaseProtocol
     private var accountService: AccountManagerProtocol

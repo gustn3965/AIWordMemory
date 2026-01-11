@@ -41,7 +41,7 @@ extension WMTarget {
     
     
     public static func accountImplementationUnitTest() -> WMTarget {
-        let targetName = "AIImplementationUnitTest"
+        let targetName = "AccountImplementationUnitTest"
         return .templateUnitTest(name: targetName,
                                  projectName: Self.accountServiceProjectName,
                                  infoPlist: defaultInfoPlist,

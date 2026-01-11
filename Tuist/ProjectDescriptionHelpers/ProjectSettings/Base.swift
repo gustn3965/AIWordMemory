@@ -4,8 +4,8 @@ import ProjectDescription
 
 // MARK: - 프로젝트 설정, 빌드번호,swift, 인증서,
 
-public let CURRENT_PROJECT_VERSION_VALUE = "9"
-public let MARKETING_VERSION_VALUE = "1.5.0"
+public let CURRENT_PROJECT_VERSION_VALUE = "10"
+public let MARKETING_VERSION_VALUE = "2.0.0"
 public let SWIFT_VERSION_VALUE = "6.2"
 public let deploymentTargetiOS = "17.4"
 

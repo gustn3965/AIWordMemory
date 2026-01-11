@@ -7,12 +7,13 @@
 
 import SwiftUI
 import Recommend
+import AppCoordinatorService
 
 @main
 struct RecommendSampleApp: App {
     var body: some Scene {
         WindowGroup {
-            RecommendContentView(diContainer: RecommendMockDIContainer())
+            RecommendContentView(diContainer: RecommendMockDIContainer(), appCoordinator: AppCoordinator())
         }
     }
 }

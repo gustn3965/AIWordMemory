@@ -7,12 +7,13 @@
 
 import SwiftUI
 import Search
+import AppCoordinatorService
 
 @main
 struct SearchSampleApp: App {
     var body: some Scene {
         WindowGroup {
-            SearchContentView(diContainer: SearchMockDIContainer())
+            SearchContentView(diContainer: SearchMockDIContainer(), appCoordinator: AppCoordinator())
         }
     }
 }
