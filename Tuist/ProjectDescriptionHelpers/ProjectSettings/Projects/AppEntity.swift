@@ -12,7 +12,7 @@ extension WMTarget {
     
     public static func appEntity() -> WMTarget {
         let targetName = "AppEntity"
-        return .templateStaticFrameworkTarget(name: targetName,
+        return .templateDynamicFrameworkTarget(name: targetName,
                                               projectName: Self.appEntityProjectName,
                                               infoPlist: defaultInfoPlist,
                                               sources: [.path("Sources/**")],
