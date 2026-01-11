@@ -111,8 +111,8 @@ public class WordMemoryDIContainer: ReviewDependencyInjection,
         
 #if MOCK
 //        let database = MockInMemoryDatabase.shared
-//        let database = ScreenShotKoreaDataBase.shared // 앱스토어 스크린샷 업데이트용도
-        let database = ScreenShotEnglishDataBase.shared // 앱스토어 스크린샷 업데이트용도
+        let database = ScreenShotKoreaDataBase.shared // 앱스토어 스크린샷 업데이트용도
+//        let database = ScreenShotEnglishDataBase.shared // 앱스토어 스크린샷 업데이트용도
         dbService = database
         aiService = AIMockImplementation()
         speechVoiceService = SpeechVoiceAppleManager.shared
