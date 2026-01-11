@@ -22,7 +22,7 @@ struct FilterTagItem: Equatable, Identifiable {
     }
     
     static func noTag() -> FilterTagItem {
-        var item = FilterTagItem(title: "태그 없음", identity: UUID().uuidString)
+        var item = FilterTagItem(title: String(localized: "태그 없음"), identity: UUID().uuidString)
         item.isNoTag = true
         return item
     }
